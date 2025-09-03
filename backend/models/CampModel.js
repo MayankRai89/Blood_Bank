@@ -59,7 +59,8 @@ const campSchema = new mongoose.Schema({
         default: "upcoming"
     }
 }, { timestamps: true }
-    
+
+);
 campSchema.pre("save", function (next) {
     if (this.date && !this.enddate) {
         const expiration = new Date(this.collectionDate);
@@ -68,6 +69,5 @@ campSchema.pre("save", function (next) {
     }
     next();
 });
-);
 
 export default mongoose.model("Camp", campSchema);
