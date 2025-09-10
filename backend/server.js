@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import authentication_routes from "./routes/authentication.js";
 import hospital_routes from "./routes/hospital.js";
 import campRoutes from "./routes/campRoutes.js";
+import requestRoutes from "./routes/hospitalRequestRoutes.js";
 
 // Load environment variables
 import dotenv from "dotenv";
@@ -20,6 +21,9 @@ app.use("/api", hospital_routes);
 
 // Camp routes
 app.use("/api/camps", campRoutes);
+
+// Request routes
+app.use("/api/requests", requestRoutes);
 
 
 // Global error handler

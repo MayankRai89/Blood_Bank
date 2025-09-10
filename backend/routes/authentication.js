@@ -84,26 +84,29 @@ router.post("/register", validateRegistration, async (req, res) => {
     const { name, email, password, role, phone, address, bloodType, healthInfo, hospitalInfo } = req.body;
 
     // Check if user exists
-    const existingUser = await User.findOne({
-      $or: [
-        { email },
-        { "hospitalInfo.licenseNumber": hospitalInfo?.licenseNumber },
-      ],
-    });
+    // Check if user exists by email
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already registered",
+      });
+    }
 
-    if (existingUser) {
-      if (existingUser.email === email) {
-        return res.status(409).json({
-          success: false,
-          message: "Email already registered",
-        });
-      } else {
+    // Check hospital license number only if hospital role
+    if (role === "hospital" && hospitalInfo?.licenseNumber) {
+      const existingHospital = await User.findOne({
+        "hospitalInfo.licenseNumber": hospitalInfo.licenseNumber,
+      });
+
+      if (existingHospital) {
         return res.status(409).json({
           success: false,
           message: "License number already registered",
         });
       }
     }
+
 
     // Prepare user object
     const userData = {

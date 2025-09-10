@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const campSchema = new mongoose.Schema({
+const HospitalCampModel = new mongoose.Schema({
 
     hospital: {
         type: mongoose.Schema.Types.ObjectId,
@@ -61,7 +61,7 @@ const campSchema = new mongoose.Schema({
 }, { timestamps: true }
 
 );
-campSchema.pre("save", function (next) {
+HospitalCampModel.pre("save", function (next) {
     if (this.date && !this.enddate) {
         const expiration = new Date(this.collectionDate);
         expiration.setDate(expiration.getDate() + 42);
@@ -70,4 +70,4 @@ campSchema.pre("save", function (next) {
     next();
 });
 
-export default mongoose.model("Camp", campSchema);
+export default mongoose.model("Camp", HospitalCampModel);

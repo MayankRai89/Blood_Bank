@@ -1,5 +1,5 @@
 import express from "express";
-import Camp from "../models/CampModel.js";
+import Camp from "../models/HospitalCampModel.js";
 import { authenticate, authorize } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -92,5 +92,11 @@ router.delete("/:id", authenticate, authorize("hospital", "admin"), async (req, 
         res.status(500).json({ success: false, message: "Server error while deleting camp" });
     }
 });
+
+
+
+
+
+
 
 export default router;
