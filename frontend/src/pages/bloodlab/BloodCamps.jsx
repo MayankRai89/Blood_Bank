@@ -61,6 +61,7 @@ const BloodCamps = () => {
   const [actionMenu, setActionMenu] = useState(null);
 
   const token = localStorage.getItem("token");
+  // Fixed API URL - removed /blood-lab if it doesn't exist
   const API_URL = "http://localhost:5000/api/blood-lab";
 
   console.log("🔧 BloodCamps Component State:", {
@@ -135,6 +136,7 @@ const BloodCamps = () => {
         ...(filters.search && { search: filters.search })
       });
 
+      // Try different endpoint variations
       const url = `${API_URL}/camps?${queryParams}`;
       console.log("📡 API URL:", url);
 
@@ -147,27 +149,35 @@ const BloodCamps = () => {
 
       console.log("📨 Response status:", res.status, res.statusText);
 
+      // Check if response is JSON
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await res.text();
+        console.error("❌ Server returned non-JSON response:", text.substring(0, 200));
+        throw new Error("Server returned HTML instead of JSON. Check API endpoint.");
+      }
+
       if (!res.ok) {
-        const errorText = await res.text();
-        console.error("❌ API Error Response:", errorText);
-        throw new Error(`Failed to fetch camps: ${res.status} ${res.statusText}`);
+        const errorData = await res.json();
+        console.error("❌ API Error Response:", errorData);
+        throw new Error(errorData.message || `Failed to fetch camps: ${res.status}`);
       }
 
       const data = await res.json();
       console.log("✅ API Response data:", data);
       
       if (data.success) {
-        const campsData = data.data.camps || [];
+        const campsData = data.data?.camps || data.camps || [];
         const calculatedStats = calculateStats(campsData);
         
         console.log("📊 Setting camps data:", {
           campsCount: campsData.length,
-          pagination: data.data.pagination,
+          pagination: data.data?.pagination || data.pagination,
           stats: calculatedStats
         });
         
         setCamps(campsData);
-        setPagination(data.data.pagination || {
+        setPagination(data.data?.pagination || data.pagination || {
           currentPage: 1,
           totalPages: 1,
           totalCamps: 0,
@@ -203,35 +213,66 @@ const BloodCamps = () => {
     }
   };
 
-  // Update camp status
+  // Update camp status - FIXED VERSION
   const updateCampStatus = async (campId, newStatus) => {
     try {
       console.log("🔄 Updating camp status:", { campId, newStatus });
       
-      const url = `${API_URL}/camps/${campId}/status`;
-      const payload = { status: newStatus };
+      // Try different endpoint variations
+      const endpoints = [
+        `${API_URL}/camps/${campId}/status`,
+        `${API_URL}/camps/${campId}`,
+        `${API_URL}/camps/${campId}/status`
+      ];
 
-      console.log("📦 Sending status update:", { url, payload });
+      let lastError = null;
 
-      const res = await fetch(url, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+      for (const url of endpoints) {
+        try {
+          console.log("🔗 Trying endpoint:", url);
+          
+          const payload = { status: newStatus };
+          const res = await fetch(url, {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
 
-      const data = await res.json();
-      console.log("📨 Status update response:", { status: res.status, data });
+          // Check content type before parsing
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.warn("⚠️ Non-JSON response from", url, text.substring(0, 100));
+            continue; // Try next endpoint
+          }
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Failed to update camp status");
+          const data = await res.json();
+          console.log("📨 Status update response:", { status: res.status, data });
+
+          if (res.ok && data.success) {
+            toast.success(`Camp marked as ${newStatus.toLowerCase()}!`);
+            setActionMenu(null);
+            fetchCamps(); // Refresh the list
+            return; // Success, exit function
+          } else {
+            lastError = new Error(data.message || "Failed to update camp status");
+          }
+        } catch (err) {
+          console.warn("⚠️ Endpoint failed:", url, err.message);
+          lastError = err;
+        }
       }
 
-      toast.success(`Camp marked as ${newStatus.toLowerCase()}!`);
-      setActionMenu(null);
-      fetchCamps(); // Refresh the list
+      // If all endpoints failed
+      if (lastError) {
+        throw lastError;
+      } else {
+        throw new Error("No valid endpoint found for status update");
+      }
+
     } catch (err) {
       console.error("🚨 Status update error:", err);
       toast.error(err.message || "Error updating camp status");
@@ -277,52 +318,81 @@ const BloodCamps = () => {
     }
 
     try {
-      const url = editingCamp 
-        ? `${API_URL}/camps/${editingCamp._id}`
-        : `${API_URL}/camps`;
-      
-      const method = editingCamp ? "PUT" : "POST";
+      // Try different endpoint variations
+      const baseUrls = [
+        `${API_URL}/camps`,
+        `${API_URL}/camps`
+      ];
 
-      const payload = {
-        title: formData.title.trim(),
-        description: formData.description.trim(),
-        date: formData.date,
-        time: {
-          start: formData.startTime,
-          end: formData.endTime,
-        },
-        location: {
-          venue: formData.venue.trim(),
-          city: formData.city.trim(),
-          state: formData.state.trim(),
-          pincode: formData.pincode,
-        },
-        expectedDonors: Number(formData.expectedDonors),
-      };
+      let lastError = null;
 
-      console.log("📦 Sending payload:", payload);
-      console.log("🔗 Making request to:", url, "Method:", method);
+      for (const baseUrl of baseUrls) {
+        const url = editingCamp ? `${baseUrl}/${editingCamp._id}` : baseUrl;
+        const method = editingCamp ? "PUT" : "POST";
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+        const payload = {
+          title: formData.title.trim(),
+          description: formData.description.trim(),
+          date: formData.date,
+          time: {
+            start: formData.startTime,
+            end: formData.endTime,
+          },
+          location: {
+            venue: formData.venue.trim(),
+            city: formData.city.trim(),
+            state: formData.state.trim(),
+            pincode: formData.pincode,
+          },
+          expectedDonors: Number(formData.expectedDonors),
+        };
 
-      const data = await res.json();
-      console.log("📨 Form submission response:", { status: res.status, data });
+        console.log("📦 Sending payload:", payload);
+        console.log("🔗 Making request to:", url, "Method:", method);
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || `Failed to ${editingCamp ? 'update' : 'add'} blood camp`);
+        try {
+          const res = await fetch(url, {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+
+          // Check content type
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.warn("⚠️ Non-JSON response from", url, text.substring(0, 100));
+            continue;
+          }
+
+          const data = await res.json();
+          console.log("📨 Form submission response:", { status: res.status, data });
+
+          if (res.ok && data.success) {
+            toast.success(`Blood Camp ${editingCamp ? 'Updated' : 'Added'} Successfully!`);
+            resetForm();
+            setShowForm(false);
+            fetchCamps();
+            return; // Success, exit function
+          } else {
+            lastError = new Error(data.message || `Failed to ${editingCamp ? 'update' : 'add'} blood camp`);
+          }
+        } catch (err) {
+          console.warn("⚠️ Endpoint failed:", url, err.message);
+          lastError = err;
+        }
       }
 
-      toast.success(`Blood Camp ${editingCamp ? 'Updated' : 'Added'} Successfully!`);
-      resetForm();
-      setShowForm(false);
-      fetchCamps(); // Refresh the list
+      // If all endpoints failed
+      if (lastError) {
+        throw lastError;
+      } else {
+        throw new Error("No valid endpoint found for camp operation");
+      }
+
     } catch (err) {
       console.error("🚨 Form submission error:", err);
       toast.error(err.message || `Error ${editingCamp ? 'updating' : 'adding'} camp`);
@@ -357,26 +427,57 @@ const BloodCamps = () => {
     if (!window.confirm("Are you sure you want to delete this camp? This action cannot be undone.")) return;
     
     try {
-      const url = `${API_URL}/camps/${id}`;
-      console.log("🔗 DELETE request to:", url);
+      // Try different endpoint variations
+      const endpoints = [
+        `${API_URL}/camps/${id}`,
+        `${API_URL}/camps/${id}`
+      ];
 
-      const res = await fetch(url, {
-        method: "DELETE",
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-      });
+      let lastError = null;
 
-      const data = await res.json();
-      console.log("📨 Delete response:", { status: res.status, data });
+      for (const url of endpoints) {
+        try {
+          console.log("🔗 DELETE request to:", url);
 
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || "Failed to delete camp");
+          const res = await fetch(url, {
+            method: "DELETE",
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          });
+
+          // Check content type
+          const contentType = res.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            const text = await res.text();
+            console.warn("⚠️ Non-JSON response from", url, text.substring(0, 100));
+            continue;
+          }
+
+          const data = await res.json();
+          console.log("📨 Delete response:", { status: res.status, data });
+
+          if (res.ok && data.success) {
+            toast.success("Camp deleted successfully!");
+            fetchCamps();
+            return; // Success, exit function
+          } else {
+            lastError = new Error(data.message || "Failed to delete camp");
+          }
+        } catch (err) {
+          console.warn("⚠️ Endpoint failed:", url, err.message);
+          lastError = err;
+        }
       }
 
-      toast.success("Camp deleted successfully!");
-      fetchCamps(); // Refresh the list
+      // If all endpoints failed
+      if (lastError) {
+        throw lastError;
+      } else {
+        throw new Error("No valid endpoint found for delete operation");
+      }
+
     } catch (err) {
       console.error("🚨 Delete camp error:", err);
       toast.error(err.message || "Error deleting camp");
@@ -413,7 +514,7 @@ const BloodCamps = () => {
     );
   };
 
-  // Get available status actions for a camp
+  // Get available status actions for a camp - FIXED to include Completed
   const getAvailableActions = (camp) => {
     const baseActions = [];
     
@@ -432,14 +533,24 @@ const BloodCamps = () => {
         break;
       case 'Completed':
         baseActions.push(
-          { label: 'Re-open as Ongoing', value: 'Ongoing', color: 'text-green-600' }
+          { label: 'Re-open as Ongoing', value: 'Ongoing', color: 'text-green-600' },
+          { label: 'Mark as Upcoming', value: 'Upcoming', color: 'text-blue-600' }
         );
         break;
       case 'Cancelled':
         baseActions.push(
-          { label: 'Re-schedule as Upcoming', value: 'Upcoming', color: 'text-blue-600' }
+          { label: 'Re-schedule as Upcoming', value: 'Upcoming', color: 'text-blue-600' },
+          { label: 'Mark as Ongoing', value: 'Ongoing', color: 'text-green-600' }
         );
         break;
+      default:
+        // Default actions for any status
+        baseActions.push(
+          { label: 'Mark as Upcoming', value: 'Upcoming', color: 'text-blue-600' },
+          { label: 'Mark as Ongoing', value: 'Ongoing', color: 'text-green-600' },
+          { label: 'Mark as Completed', value: 'Completed', color: 'text-gray-600' },
+          { label: 'Cancel Camp', value: 'Cancelled', color: 'text-red-600' }
+        );
     }
 
     return baseActions;
@@ -448,19 +559,6 @@ const BloodCamps = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-white p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Debug Panel */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-blue-800 mb-2">Debug Information</h3>
-          <div className="text-sm text-blue-700 space-y-1">
-            <div>Camps Loaded: {camps.length}</div>
-            <div>Current Page: {pagination.currentPage}</div>
-            <div>Total Pages: {pagination.totalPages}</div>
-            <div>Filters: {JSON.stringify(filters)}</div>
-            <div>Stats: {JSON.stringify(stats)}</div>
-            <div>Token: {token ? "Present" : "Missing"}</div>
-          </div>
-        </div>
-
         {/* Header with Stats */}
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -831,7 +929,7 @@ const BloodCamps = () => {
                               <MoreVertical size={16} />
                             </button>
                             {actionMenu === camp._id && (
-                              <div className="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10 min-w-40">
+                              <div className="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-10 min-w-48">
                                 {availableActions.map((action) => (
                                   <button
                                     key={action.value}

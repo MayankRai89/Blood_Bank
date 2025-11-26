@@ -223,6 +223,117 @@ export const deleteBloodCamp = async (req, res) => {
   }
 };
 
+
+// Add these to your bloodLabController.js
+
+/**
+ * @desc Update a Blood Camp
+ * @route PUT /api/blood-lab/camps/:id
+ * @access Private (Blood Lab)
+ */
+export const updateBloodCamp = async (req, res) => {
+  try {
+    const labId = req.user._id;
+    const { id } = req.params;
+    const { title, description, date, time, location, expectedDonors } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid camp ID" });
+    }
+
+    const camp = await BloodCamp.findOne({ _id: id, hospital: labId });
+    if (!camp) {
+      return res.status(404).json({ success: false, message: "Camp not found" });
+    }
+
+    // Update fields
+    if (title) camp.title = title;
+    if (description !== undefined) camp.description = description;
+    if (date) camp.date = new Date(date);
+    if (time) camp.time = time;
+    if (location) camp.location = location;
+    if (expectedDonors) camp.expectedDonors = expectedDonors;
+
+    await camp.save();
+
+    // Add to history
+    await Facility.findByIdAndUpdate(labId, {
+      $push: {
+        history: {
+          eventType: "Blood Camp",
+          description: `Updated camp: ${camp.title}`,
+          date: new Date(),
+          referenceId: camp._id,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Camp updated successfully",
+      data: camp,
+    });
+  } catch (error) {
+    console.error("Update Blood Camp Error:", error);
+    res.status(500).json({ success: false, message: "Failed to update camp" });
+  }
+};
+
+/**
+ * @desc Update Blood Camp Status
+ * @route PATCH /api/blood-lab/camps/:id/status
+ * @access Private (Blood Lab)
+ */
+export const updateCampStatus = async (req, res) => {
+  try {
+    const labId = req.user._id;
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid camp ID" });
+    }
+
+    const validStatuses = ["Upcoming", "Ongoing", "Completed", "Cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid status. Must be: Upcoming, Ongoing, Completed, or Cancelled" 
+      });
+    }
+
+    const camp = await BloodCamp.findOne({ _id: id, hospital: labId });
+    if (!camp) {
+      return res.status(404).json({ success: false, message: "Camp not found" });
+    }
+
+    camp.status = status;
+    await camp.save();
+
+    // Add to history
+    await Facility.findByIdAndUpdate(labId, {
+      $push: {
+        history: {
+          eventType: "Blood Camp",
+          description: `Changed camp status to: ${status} - ${camp.title}`,
+          date: new Date(),
+          referenceId: camp._id,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      message: `Camp status updated to ${status}`,
+      data: camp,
+    });
+  } catch (error) {
+    console.error("Update Camp Status Error:", error);
+    res.status(500).json({ success: false, message: "Failed to update camp status" });
+  }
+};
+
+
 /* ==============================================================
    BLOOD STOCK MANAGEMENT (FIXED)
    ============================================================== */

@@ -15,7 +15,9 @@ import BloodCamps from "./pages/bloodlab/BloodCamps";
 import BloodlabDashboard from "./pages/bloodlab/BloodlabDashboard";
 import BloodStock from "./pages/bloodlab/BloodStock";
 import LabProfile from "./pages/bloodlab/LabProfile";
-import AdminDonors from "./pages/admin/GetAllDonors";
+import GetAllFacilities from "./pages/admin/GetAllFacilities";
+import GetAllDonors from "./pages/admin/GetAllDonors";
+import DonorCampsList from "./pages/donor/DonorCampsList";
 
 function App() {
   return (
@@ -29,6 +31,7 @@ function App() {
         <Route path="/donor" element={<ProtectedRoute><DashboardLayout userRole="donor" /></ProtectedRoute>}>
           <Route index element={<DonorDashboard />} />
           <Route path="profile" element={<DonorProfile />} />
+          <Route path="camps" element={<DonorCampsList />} />
         </Route>
       
         <Route path="/hospital" element={<ProtectedRoute><DashboardLayout userRole="hospital" /></ProtectedRoute>}>
@@ -45,7 +48,8 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><DashboardLayout userRole="admin" /></ProtectedRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="verification" element={<AdminFacilities />} />
-          <Route path="donors" element={<AdminDonors />} />
+          <Route path="donors" element={<GetAllDonors />} />
+          <Route path="facilities" element={<GetAllFacilities />} />
         </Route>
       </Routes>
   );

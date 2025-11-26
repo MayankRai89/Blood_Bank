@@ -22,7 +22,7 @@ const donorSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
-      select: false,
+      select: false, // 🔑 IMPORTANT: Prevents password from being returned in queries by default
     },
     phone: {
       type: String,
@@ -32,6 +32,7 @@ const donorSchema = new mongoose.Schema(
     role: {
       type: String,
       default: "donor",
+      enum: ["donor"], // Ensure role is restricted
     },
 
     // 📍 Location
@@ -67,8 +68,10 @@ const donorSchema = new mongoose.Schema(
       type: Number,
       min: [45, "Minimum weight should be 45kg to donate blood"],
     },
-    lastDonationDate: { type: Date },
-    eligibleToDonate: { type: Boolean, default: true },
+    lastDonationDate: { type: Date }, // Automatically updated by history entry
+    
+    // This field can be used for manual/medical override, separate from the 90-day cooldown calculated by the virtual
+    eligibleToDonate: { type: Boolean, default: true }, 
 
     // 🧾 Documents (optional for verification)
     idProof: {
@@ -81,12 +84,12 @@ const donorSchema = new mongoose.Schema(
     donationHistory: [
       {
         donationDate: { type: Date, default: Date.now },
-        facility: { type: mongoose.Schema.Types.ObjectId, ref: "Facility" },
+        facility: { type: mongoose.Schema.Types.ObjectId, ref: "Facility" }, // Reference to the Blood Bank/Facility
         bloodGroup: {
           type: String,
           enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
         },
-        quantity: { type: Number, default: 1 },
+        quantity: { type: Number, default: 1 }, // Assuming 1 unit/pint
         remarks: String,
         verified: { type: Boolean, default: false },
       },
@@ -101,32 +104,31 @@ const donorSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//
-// 🔐 Hash password before saving
-//
+// 🔐 Pre-save hook: Hash password before saving if it's new or modified
 donorSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
+  
+  // Use a consistent salt round value (e.g., 12)
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-//
-// 🧠 Compare password method
-//
+// 🧠 Instance Method: Compare password
 donorSchema.methods.comparePassword = async function (candidatePassword) {
+  // Compares the given password with the hashed password stored in the database
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-//
-// 🧩 Virtuals for donor status
-//
+// 🧩 Virtual: Calculate 90-day donation eligibility based on last donation date
 donorSchema.virtual("isEligible").get(function () {
   if (!this.lastDonationDate) return true;
   const last = new Date(this.lastDonationDate);
   const now = new Date();
-  const diff = (now - last) / (1000 * 60 * 60 * 24); // days
-  return diff >= 90; // 3 months gap rule
+  const diff = (now - last) / (1000 * 60 * 60 * 24); // Difference in days
+  return diff >= 90; // Standard 90-day gap rule
 });
 
-export default mongoose.model("Donor", donorSchema);
+
+const Donor = mongoose.model("Donor", donorSchema);
+export default Donor;

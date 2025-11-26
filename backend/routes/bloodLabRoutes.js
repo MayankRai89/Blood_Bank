@@ -1,8 +1,3 @@
-import {
-  addBloodStock,
-  removeBloodStock,
-  getBloodStock,
-} from "../controllers/bloodLabController.js";
 import express from "express";
 import {
   createBloodCamp,
@@ -10,6 +5,11 @@ import {
   getBloodLabCamps,
   getBloodLabDashboard,
   getBloodLabHistory,
+  updateBloodCamp,        // ADD THIS
+  updateCampStatus,       // ADD THIS
+  addBloodStock,
+  removeBloodStock,
+  getBloodStock,
 } from "../controllers/bloodLabController.js";
 import { protectFacility } from "../middlewares/facilityMiddleware.js";
 
@@ -21,8 +21,10 @@ router.get("/history", protectFacility, getBloodLabHistory);
 
 // Camp management
 router.post("/camps", protectFacility, createBloodCamp);
-router.get("/camps", protectFacility, getBloodLabCamps); // Fixed: removed :id
-router.delete("/camps/:id", protectFacility, deleteBloodCamp); // Fixed: added /camps prefix
+router.get("/camps", protectFacility, getBloodLabCamps);
+router.put("/camps/:id", protectFacility, updateBloodCamp);        // ADD THIS
+router.patch("/camps/:id/status", protectFacility, updateCampStatus); // ADD THIS
+router.delete("/camps/:id", protectFacility, deleteBloodCamp);
 
 // Blood stock routes
 router.post("/blood/add", protectFacility, addBloodStock);
