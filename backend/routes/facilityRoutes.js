@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  getAllLabs,
   getFacilityDashboard,
   getProfile,
   updateProfile,
@@ -29,5 +30,7 @@ router.get("/profile", protectFacility, getProfile);
  * @access  Private
  */
 router.put("/profile", protectFacility, updateProfile);
+
+router.get("/labs", protectFacility , getAllLabs);
 
 export default router;

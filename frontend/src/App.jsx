@@ -18,6 +18,14 @@ import LabProfile from "./pages/bloodlab/LabProfile";
 import GetAllFacilities from "./pages/admin/GetAllFacilities";
 import GetAllDonors from "./pages/admin/GetAllDonors";
 import DonorCampsList from "./pages/donor/DonorCampsList";
+import LabManageRequests from "./pages/bloodlab/LabManageRequests";
+import HospitalRequestBlood from "./pages/hospital/HospitalRequestBlood";
+import HospitalRequestHistory from "./pages/hospital/HospitalRequestHistory";
+import HospitalBloodStock from "./pages/hospital/HospitalBloodStock";
+import BloodLabDonor from "./pages/bloodlab/BloodLabDonor";
+import DonorDirectory from "./pages/hospital/DonorDirectory";
+import About from "./components/about/About";
+import Contact from "./components/contact/Contact";
 
 function App() {
   return (
@@ -27,6 +35,8 @@ function App() {
         <Route path="/register/donor" element={<DonorRegister />} />
         <Route path="/register/facility" element={<FacilityForm />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
         <Route path="/donor" element={<ProtectedRoute><DashboardLayout userRole="donor" /></ProtectedRoute>}>
           <Route index element={<DonorDashboard />} />
@@ -36,6 +46,10 @@ function App() {
       
         <Route path="/hospital" element={<ProtectedRoute><DashboardLayout userRole="hospital" /></ProtectedRoute>}>
           <Route index element={<HospitalDashboard />} />
+          <Route path="blood-request-create" element={<HospitalRequestBlood />} />
+          <Route path="blood-request-history" element={<HospitalRequestHistory />} />
+          <Route path="inventory" element={<HospitalBloodStock />} />
+          <Route path="donors" element={<DonorDirectory />} />
        </Route>
       
         <Route path="/lab" element={<ProtectedRoute><DashboardLayout userRole="blood-lab" /></ProtectedRoute>}>
@@ -43,6 +57,8 @@ function App() {
           <Route path="inventory" element={<BloodStock />} />
           <Route path="camps" element={<BloodCamps />} />
           <Route path="profile" element={<LabProfile />} />
+          <Route path="requests" element={<LabManageRequests />} />
+          <Route path="donor" element={<BloodLabDonor />} />
         </Route>
         
         <Route path="/admin" element={<ProtectedRoute><DashboardLayout userRole="admin" /></ProtectedRoute>}>

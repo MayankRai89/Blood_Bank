@@ -30,7 +30,6 @@ const DashboardLayout = ({ userRole = "donor" }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [notifications, setNotifications] = useState([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Added loading state
 
@@ -87,9 +86,9 @@ const DashboardLayout = ({ userRole = "donor" }) => {
       items: [
         { path: "/donor", label: "Dashboard", icon: BarChart3, badge: null },
         { path: "/donor/profile", label: "My Profile", icon: User, badge: null },
-        { path: "/donor/donate", label: "Donate Blood", icon: Droplet, badge: "New" },
+        { path: "/donor/donate", label: "Donate Blood", icon: Droplet, badge: null },
         { path: "/donor/history", label: "Donation History", icon: History, badge: null },
-        { path: "/donor/camps", label: "Blood Camps", icon: Calendar, badge: "3" },
+        { path: "/donor/camps", label: "Blood Camps", icon: Calendar, badge: null },
       ],
     },
     hospital: {
@@ -99,10 +98,10 @@ const DashboardLayout = ({ userRole = "donor" }) => {
       icon: Building,
       items: [
         { path: "/hospital", label: "Dashboard", icon: BarChart3, badge: null },
-        { path: "/hospital/requests", label: "Blood Requests", icon: ClipboardList, badge: "5" },
-        { path: "/hospital/inventory", label: "Inventory", icon: Droplet, badge: "Low" },
+        { path: "/hospital/blood-request-create", label: "Blood Requests", icon: ClipboardList, badge: null },
+        { path: "/hospital/inventory", label: "Inventory", icon: Droplet, badge: null },
         { path: "/hospital/donors", label: "Donors", icon: User, badge: null },
-        { path: "/hospital/emergency", label: "Emergency", icon: Ambulance, badge: "2" },
+        { path: "/hospital/blood-request-history", label: "History", icon: Ambulance, badge: null },
         { path: "/hospital/reports", label: "Reports", icon: Activity, badge: null },
       ],
     },
@@ -114,9 +113,10 @@ const DashboardLayout = ({ userRole = "donor" }) => {
       items: [
         { path: "/lab", label: "Dashboard", icon: BarChart3, badge: null },
         { path: "/lab/inventory", label: "Inventory", icon: Droplet, badge: null },
+        { path: "/lab/Donor", label: "Donors", icon: User, badge: null },
+        { path: "/lab/camps", label: "Camps", icon: Calendar, badge: null },
         { path: "/lab/requests", label: "Requests", icon: ClipboardList, badge: null },
         { path: "/lab/profile", label: "Profile", icon: CheckCircle, badge: null },
-        { path: "/lab/camps", label: "Camps", icon: Calendar, badge: null },
       ],
     },
     admin: {
@@ -126,7 +126,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
       icon: Shield,
       items: [
         { path: "/admin", label: "Overview", icon: BarChart3, badge: null },
-        { path: "/admin/verification", label: "Verification", icon: Shield, badge: "8" },
+        { path: "/admin/verification", label: "Verification", icon: Shield, badge: null },
         { path: "/admin/facilities", label: "Facilities", icon: Building, badge: null },
         { path: "/admin/donors", label: "Donors", icon: User, badge: null },
         { path: "/admin/inventory", label: "Inventory", icon: Droplet, badge: null },
@@ -174,7 +174,6 @@ const DashboardLayout = ({ userRole = "donor" }) => {
             }
 
             setUserData(user);
-            fetchNotifications(token);
             setIsLoading(false); // Success
             return;
 
@@ -216,21 +215,6 @@ const DashboardLayout = ({ userRole = "donor" }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const fetchNotifications = async (token) => {
-    // Notifications fetch logic remains the same
-    try {
-      const res = await fetch("http://localhost:5000/api/notifications", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        // Assuming notifications array is available at data.notifications
-        setNotifications(data.notifications || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch notifications:", error);
-    }
-  };
 
   const normalizedRole = userRole?.toLowerCase().replace("-", "_");
   const config = menuConfig[normalizedRole] || {
@@ -246,35 +230,8 @@ const DashboardLayout = ({ userRole = "donor" }) => {
     navigate("/login");
   };
 
-  const getNotificationIcon = (type) => {
-    switch (type) {
-      case "emergency":
-        return AlertTriangle;
-      case "request":
-        return ClipboardList;
-      case "approval":
-        return CheckCircle;
-      case "camp":
-        return Calendar;
-      default:
-        return Bell;
-    }
-  };
+  
 
-  const getNotificationColor = (type) => {
-    switch (type) {
-      case "emergency":
-        return "text-red-600 bg-red-50 border-l-4 border-red-500";
-      case "request":
-        return "text-blue-600 bg-blue-50 border-l-4 border-blue-500";
-      case "approval":
-        return "text-green-600 bg-green-50 border-l-4 border-green-500";
-      case "camp":
-        return "text-purple-600 bg-purple-50 border-l-4 border-purple-500";
-      default:
-        return "text-gray-600 bg-gray-50 border-l-4 border-gray-500";
-    }
-  };
 
   const getBadgeColor = (badge) => {
     if (badge === "New") return "bg-green-500 text-white";
@@ -295,7 +252,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-red-50 via-white to-red-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-red-50 to-white">
       {/* HEADER */}
       <header
         className={`flex justify-between items-center bg-white/95 backdrop-blur-md shadow-sm border-b border-red-100 px-4 sm:px-6 py-3 sticky top-0 z-50 transition-all duration-300 ${
@@ -339,82 +296,6 @@ const DashboardLayout = ({ userRole = "donor" }) => {
         {/* Right Section */}
         <div className="flex items-center gap-2 sm:gap-4">
          
-
-          {/* Notifications */}
-          <div className="relative group">
-            <button
-              className="p-2 rounded-lg hover:bg-red-100 transition-all duration-200 relative"
-              style={{ color: theme.primary[600] }}
-            >
-              <Bell size={20} />
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse border-2 border-white">
-                  {notifications.length > 9 ? '9+' : notifications.length}
-                </span>
-              )}
-            </button>
-
-            {/* Notifications Dropdown (omitted for brevity) */}
-            <div className="absolute right-0 top-12 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-red-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform translate-y-2">
-              <div className="p-4 border-b border-red-100">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold" style={{ color: theme.primary[700] }}>
-                    Notifications
-                  </h3>
-                  {notifications.length > 0 && (
-                    <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded-full">
-                      {notifications.length} new
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="max-h-96 overflow-y-auto">
-                {notifications.length > 0 ? (
-                  notifications.slice(0, 10).map((notification, index) => {
-                    const Icon = getNotificationIcon(notification.type);
-                    return (
-                      <div
-                        key={index}
-                        className={`p-4 border-b border-red-50 last:border-b-0 hover:bg-red-50 cursor-pointer transition-all duration-200 ${getNotificationColor(
-                          notification.type
-                        )}`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 mt-0.5">
-                            <Icon size={16} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                              {notification.title}
-                            </p>
-                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                              {notification.message}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-2">
-                              {notification.time}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <div className="p-8 text-center text-gray-500">
-                    <Bell size={32} className="mx-auto mb-2 opacity-50" />
-                    <p>No new notifications</p>
-                  </div>
-                )}
-              </div>
-              {notifications.length > 10 && (
-                <div className="p-3 border-t border-red-100 text-center">
-                  <button className="text-sm text-red-600 hover:text-red-700 font-medium">
-                    View all notifications
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* User Profile */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div
@@ -581,7 +462,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
         >
           <div className="h-full overflow-auto p-4 sm:p-6">
             {/* PASSING DATA TO OUTLET HERE */}
-            <Outlet context={{ userData, notifications, theme }} />
+            <Outlet context={{ userData, theme }} />
           </div>
         </main>
       </div>

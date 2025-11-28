@@ -213,18 +213,7 @@ const BloodLabDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-white p-6">
-      {/* Debug Panel - Remove in production */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-blue-800 mb-2">Debug Information</h3>
-        <div className="text-sm text-blue-700 space-y-1">
-          <div>Stock Data: {stock.length} items</div>
-          <div>Lab Data: {lab ? "Loaded" : "Missing"}</div>
-          <div>Dashboard Data: {dashboard ? "Loaded" : "Missing"}</div>
-          <div>Total History: {lab?.history?.length || 0} entries</div>
-          <div>Login History: {loginHistory.length} entries</div>
-          <div>Recent Camps: {dashboard?.recentCamps?.length || 0} camps</div>
-        </div>
-      </div>
+      
 
       {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8">

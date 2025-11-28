@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import Blood from "../models/bloodModel.js";
 import BloodCamp from "../models/bloodCampModel.js";
 import Facility from "../models/facilityModel.js";
+import BloodRequest from "../models/bloodRequestModel.js";
+
 
 /* ==============================================================
    BLOOD LAB DASHBOARD & HISTORY
@@ -32,12 +34,12 @@ export const getBloodLabDashboard = async (req, res) => {
     const recentCamps = camps.slice(0, 5);
 
     res.json({
-      stats: { 
-        totalCamps, 
-        upcomingCamps, 
-        completedCamps, 
+      stats: {
+        totalCamps,
+        upcomingCamps,
+        completedCamps,
         totalDonors,
-        totalUnits 
+        totalUnits
       },
       recentCamps,
       facility: facility // Now includes history as fallback
@@ -296,9 +298,9 @@ export const updateCampStatus = async (req, res) => {
 
     const validStatuses = ["Upcoming", "Ongoing", "Completed", "Cancelled"];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid status. Must be: Upcoming, Ongoing, Completed, or Cancelled" 
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status. Must be: Upcoming, Ongoing, Completed, or Cancelled"
       });
     }
 
@@ -435,7 +437,7 @@ export const removeBloodStock = async (req, res) => {
     }
 
     stock.quantity -= Number(quantity);
-    
+
     // Remove the document if quantity becomes zero
     if (stock.quantity === 0) {
       await Blood.findByIdAndDelete(stock._id);
@@ -479,15 +481,211 @@ export const getBloodStock = async (req, res) => {
 
     const stock = await Blood.find({ bloodLab: labId }).sort({ bloodGroup: 1 });
 
-    res.json({ 
-      success: true, 
-      data: stock 
+    res.json({
+      success: true,
+      data: stock
     });
   } catch (error) {
     console.error("Get Blood Stock Error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch stock",
+    });
+  }
+};
+// ---------------
+
+/* ==============================================================
+   BLOOD REQUEST MANAGEMENT FOR BLOOD LABS
+   ============================================================== */
+
+/**
+ * @desc Get all blood requests for a lab
+ * @route GET /api/blood-lab/blood/requests
+ * @access Private (Blood Lab)
+ */
+export const getLabBloodRequests = async (req, res) => {
+  try {
+    const labId = req.user._id;
+
+    const requests = await BloodRequest.find({ labId })
+      .populate("hospitalId", "name email phone address")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      requests
+    });
+  } catch (err) {
+    console.error("Get Lab Requests Error:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch blood requests"
+    });
+  }
+};
+
+/**
+ * @desc Update blood request status (accept/reject)
+ * @route PUT /api/blood-lab/blood/requests/:id
+ * @access Private (Blood Lab)
+ */
+export const updateBloodRequestStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { action } = req.body; // accept / reject
+    const labId = req.user._id;
+
+    if (!["accept", "reject"].includes(action)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid action. Must be 'accept' or 'reject'" 
+      });
+    }
+
+    // Find the request
+    const request = await BloodRequest.findOne({ 
+      _id: id, 
+      labId 
+    }).populate("hospitalId", "name");
+
+    if (!request) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Request not found" 
+      });
+    }
+
+    if (request.status !== "pending") {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Request already processed" 
+      });
+    }
+
+    // If accepting, check stock availability
+    if (action === "accept") {
+      const labStock = await Blood.findOne({ 
+        bloodLab: labId, 
+        bloodGroup: request.bloodType 
+      });
+
+      if (!labStock || labStock.quantity < request.units) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock. Available: ${labStock?.quantity || 0} units, Requested: ${request.units} units`
+        });
+      }
+
+      // Remove from lab stock
+      labStock.quantity -= request.units;
+      
+      if (labStock.quantity === 0) {
+        await Blood.findByIdAndDelete(labStock._id);
+      } else {
+        await labStock.save();
+      }
+
+      // Add to hospital stock (create or update)
+      const hospitalStock = await Blood.findOne({
+        hospital: request.hospitalId._id,
+        bloodGroup: request.bloodType
+      });
+
+      const expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + 42); // 42 days expiry
+
+      if (hospitalStock) {
+        hospitalStock.quantity += request.units;
+        hospitalStock.expiryDate = expiryDate;
+        await hospitalStock.save();
+      } else {
+        // FIX: Use hospital field instead of bloodLab
+        await Blood.create({
+          bloodGroup: request.bloodType,
+          quantity: request.units,
+          expiryDate,
+          hospital: request.hospitalId._id // This is the fix
+        });
+      }
+
+      // Add history to both facilities
+      await Facility.findByIdAndUpdate(labId, {
+        $push: {
+          history: {
+            eventType: "Stock Update",
+            description: `Transferred ${request.units} units of ${request.bloodType} to ${request.hospitalId.name}`,
+            date: new Date(),
+            referenceId: request._id,
+          },
+        },
+      });
+
+      await Facility.findByIdAndUpdate(request.hospitalId._id, {
+        $push: {
+          history: {
+            eventType: "Stock Update",
+            description: `Received ${request.units} units of ${request.bloodType} from blood lab`,
+            date: new Date(),
+            referenceId: request._id,
+          },
+        },
+      });
+    } else {
+      // For reject action, just add to history
+      await Facility.findByIdAndUpdate(labId, {
+        $push: {
+          history: {
+            eventType: "Stock Update",
+            description: `Rejected blood request for ${request.units} units of ${request.bloodType} from ${request.hospitalId.name}`,
+            date: new Date(),
+            referenceId: request._id,
+          },
+        },
+      });
+    }
+
+    // Update request status
+    request.status = action === "accept" ? "accepted" : "rejected";
+    request.processedAt = new Date();
+    await request.save();
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Request ${action}ed successfully`,
+      data: request
+    });
+
+  } catch (err) {
+    console.error("Update Request Status Error:", err);
+    res.status(500).json({ 
+      success: false, 
+      message: err.message || "Failed to process request" 
+    });
+  }
+};
+
+/**
+ * @desc Get all approved blood labs for hospitals
+ * @route GET /api/facility/labs
+ * @access Private (Hospital)
+ */
+export const getAllLabs = async (req, res) => {
+  try {
+    const labs = await Facility.find({
+      facilityType: "blood-lab",
+      status: "approved"
+    }).select("name email phone address operatingHours");
+
+    res.status(200).json({
+      success: true,
+      labs
+    });
+  } catch (error) {
+    console.error("Get Labs Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching blood labs"
     });
   }
 };

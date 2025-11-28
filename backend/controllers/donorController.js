@@ -360,3 +360,215 @@ export const getDonorHistory = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to fetch donation history." });
   }
 };
+
+// Add these to your bloodLabController.js
+
+/**
+ * @desc Search donors
+ * @route GET /api/blood-lab/donors/search
+ * @access Private (Blood Lab)
+ */
+export const searchDonor = async (req, res) => {
+  try {
+    const { term } = req.query;
+
+    if (!term) {
+      return res.status(400).json({ success: false, message: "Search term required" });
+    }
+
+    const donors = await Donor.find({
+      $or: [
+        { fullName: { $regex: term, $options: "i" } },
+        { email: { $regex: term, $options: "i" } },
+        { phone: { $regex: term, $options: "i" } }
+      ]
+    })
+    .select('fullName email phone bloodGroup lastDonationDate donationHistory')
+    .limit(20)
+    .sort({ lastDonationDate: -1 });
+
+    res.status(200).json({ success: true, donors });
+  } catch (err) {
+    console.error("Search donor error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/**
+ * @desc Mark donation
+ * @route POST /api/blood-lab/donors/donate/:id
+ * @access Private (Blood Lab)
+ */
+export const markDonation = async (req, res) => {
+  try {
+    const donorId = req.params.id;
+    const labId = req.user._id;
+    const { quantity = 1, remarks = "", bloodGroup } = req.body;
+
+    const donor = await Donor.findById(donorId);
+    if (!donor) {
+      return res.status(404).json({ success: false, message: "Donor not found" });
+    }
+
+    // Check if donor can donate (3 months gap)
+    if (donor.lastDonationDate) {
+      const lastDonation = new Date(donor.lastDonationDate);
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+      
+      if (lastDonation > threeMonthsAgo) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Donor cannot donate yet. Minimum 3 months required between donations." 
+        });
+      }
+    }
+
+    // Update last donation date
+    donor.lastDonationDate = new Date();
+    
+    // Update blood group if provided
+    if (bloodGroup) {
+      donor.bloodGroup = bloodGroup;
+    }
+
+    // Add to donation history
+    donor.donationHistory.push({
+      donationDate: new Date(),
+      facility: labId,
+      bloodGroup: bloodGroup || donor.bloodGroup,
+      quantity,
+      remarks,
+      verified: true
+    });
+
+    await donor.save();
+
+    // Add to facility history
+    await Facility.findByIdAndUpdate(labId, {
+      $push: {
+        history: {
+          eventType: "Donation",
+          description: `Recorded donation from ${donor.fullName} - ${quantity} unit(s) of ${bloodGroup || donor.bloodGroup}`,
+          date: new Date(),
+          referenceId: donor._id,
+        },
+      },
+    });
+
+    // Add to blood stock
+    const bloodType = bloodGroup || donor.bloodGroup;
+    await addToBloodStock(labId, bloodType, quantity);
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Donation recorded successfully", 
+      donor 
+    });
+  } catch (err) {
+    console.error("Mark donation error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/**
+ * @desc Get recent donations
+ * @route GET /api/blood-lab/donations/recent
+ * @access Private (Blood Lab)
+ */
+export const getRecentDonations = async (req, res) => {
+  try {
+    const labId = req.user._id;
+    
+    // Get today's start and end
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Get this week's start
+    const weekStart = new Date(today);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+
+    const [todayDonations, weekDonations, allDonations, recentDonors] = await Promise.all([
+      // Today's donations
+      Donor.countDocuments({
+        'donationHistory.facility': labId,
+        'donationHistory.donationDate': { $gte: today, $lt: tomorrow }
+      }),
+      
+      // This week's donations
+      Donor.countDocuments({
+        'donationHistory.facility': labId,
+        'donationHistory.donationDate': { $gte: weekStart }
+      }),
+      
+      // Total donations
+      Donor.aggregate([
+        { $unwind: '$donationHistory' },
+        { $match: { 'donationHistory.facility': labId } },
+        { $count: 'total' }
+      ]),
+      
+      // Recent donations with donor details
+      Donor.find({
+        'donationHistory.facility': labId
+      })
+      .select('fullName bloodGroup donationHistory')
+      .sort({ 'donationHistory.donationDate': -1 })
+      .limit(10)
+    ]);
+
+    // Format recent donations
+    const recentDonations = recentDonors.flatMap(donor => 
+      donor.donationHistory
+        .filter(d => d.facility.equals(labId))
+        .slice(0, 3)
+        .map(d => ({
+          donorName: donor.fullName,
+          bloodGroup: d.bloodGroup,
+          quantity: d.quantity,
+          date: d.donationDate,
+          remarks: d.remarks
+        }))
+    ).sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 10);
+
+    res.json({
+      success: true,
+      stats: {
+        today: todayDonations,
+        thisWeek: weekDonations,
+        total: allDonations[0]?.total || 0
+      },
+      donations: recentDonations
+    });
+  } catch (err) {
+    console.error("Get recent donations error:", err);
+    res.status(500).json({ success: false, message: "Failed to fetch recent donations" });
+  }
+};
+
+// Helper function to add to blood stock
+const addToBloodStock = async (labId, bloodType, quantity) => {
+  try {
+    let stock = await Blood.findOne({ bloodGroup: bloodType, bloodLab: labId });
+
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 42);
+
+    if (stock) {
+      stock.quantity += quantity;
+      stock.expiryDate = expiryDate;
+      await stock.save();
+    } else {
+      await Blood.create({
+        bloodGroup: bloodType,
+        quantity,
+        expiryDate,
+        bloodLab: labId,
+      });
+    }
+  } catch (error) {
+    console.error("Error adding to blood stock:", error);
+  }
+};

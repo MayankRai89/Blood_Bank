@@ -206,3 +206,23 @@ export const getFacilityDashboard = async (req, res) => {
     });
   }
 };
+
+export const getAllLabs = async (req, res) => {
+  try {
+    const labs = await Facility.find({ 
+      facilityType: "blood-lab", 
+      status: "approved" 
+    }).select("name email phone address operatingHours");
+
+    res.status(200).json({ 
+      success: true, 
+      labs 
+    });
+  } catch (error) {
+    console.error("Get Labs Error:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error fetching blood labs" 
+    });
+  }
+}

@@ -36,7 +36,8 @@ import bloodLabRoutes from "./routes/bloodLabRoutes.js";
 app.use("/api/blood-lab", bloodLabRoutes);
 
 
-
+import hospitalRoutes from "./routes/hospitalRoutes.js";
+app.use("/api/hospital", hospitalRoutes);
 
 
 // 🗄️ DB Connection

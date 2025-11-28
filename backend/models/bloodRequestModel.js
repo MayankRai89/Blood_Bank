@@ -1,35 +1,34 @@
+// models/bloodRequestModel.js
 import mongoose from "mongoose";
 
-const bloodRequestSchema = new mongoose.Schema(
-  {
-    hospital: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Facility",
-      required: true,
-    },
-    bloodLab: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Facility",
-      required: true,
-    },
-    bloodGroup: {
-      type: String,
-      required: true,
-      enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    },
-    units: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    status: {
-      type: String,
-      enum: ["Pending", "Accepted", "Rejected", "Completed"],
-      default: "Pending",
-    },
-    reason: { type: String }, // Optional reason if reject
+const bloodRequestSchema = new mongoose.Schema({
+  hospitalId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Facility", 
+    required: true 
   },
-  { timestamps: true }
-);
+  labId: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "Facility", 
+    required: true 
+  },
+  bloodType: { 
+    type: String, 
+    required: true,
+    enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]
+  },
+  units: { 
+    type: Number, 
+    required: true, 
+    min: 1 
+  },
+  status: { 
+    type: String, 
+    enum: ["pending", "accepted", "rejected"], 
+    default: "pending" 
+  },
+  processedAt: Date,
+  notes: String
+}, { timestamps: true });
 
 export default mongoose.model("BloodRequest", bloodRequestSchema);
