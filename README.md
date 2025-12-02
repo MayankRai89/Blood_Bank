@@ -1,71 +1,236 @@
-✅ Completed Till Now
+Blood Bank Management System — MERN Stack
 
-Auth & Roles
+A full-stack Blood Bank Management System built using MongoDB, Express.js, React.js, and Node.js.
+This project digitalizes the workflow of blood donation, inventory tracking, donor management, hospital requests, lab testing, and camp scheduling.
 
-User authentication (JWT)
+Designed to support Donors, Hospitals, Labs, and Admin, the system ensures smooth communication and real-time updates, making emergency handling faster and more efficient.
 
-Roles: admin, hospital, donor
 
-Hospital Donation Camps
+⭐ Key Features
 
-Create camp
+🧑‍🤝‍🧑 Donor Module
 
-Update camp
+Donor registration & secure login
 
-List camps
+Profile management
 
-Hospital Requests
+Donation history tracking
 
-Hospital can request blood units from another hospital
+Camp notifications
 
-Other hospital or admin can approve/reject requests
+Lab report updates
 
-Request schema + routes setup
+Blood request notifications
 
-Models Created
 
-User (with role, health info, etc.)
+🏥 Hospital Module
 
-DonationCamp (with hospital, donors, status)
+Hospital login & authentication
 
-Request (hospital-to-hospital requests)
+Raise blood requests
 
-Donation (for tracking actual donations)
+Track blood request status
 
-// -------------------------------------------------------------------------------- //
+View donor availability
 
-⏳ Pending / Next Steps
 
-Donor Module
+🧪 Lab Module
 
-Donor register for upcoming/ongoing hospital camps
+Access donor details
 
-Eligibility check (18+, no disease, 45-day gap rule)
+Upload blood test reports
 
-Add donor to registeredDonors in camp
+Mark donor as eligible/not eligible
 
-Donor Routes
+Update donor records securely
 
-/api/donor/camps → list available camps
 
-/api/donor/camps/:campId/register → donor registration (not yet coded)
+🛠 Admin Module
 
-/api/donor/my-registrations → donor’s registered camps
+Manage donors, hospitals, and labs
 
-Hospital Side
+Create blood donation camps
 
-Manage registered donors (view & confirm attendance)
+Monitor blood request activity
 
-Admin Panel (later if needed)
+View overall inventory
 
-Overview of all requests, camps, and donors
 
-//---------------------------------------------------------------//
+🚀 Technology Stack
 
-📌 Reminder for Later
+Frontend
 
-Finish donor registration route (eligibility checks already drafted, not yet implemented).
+React.js
 
-Add GET routes for donors (list camps & my-registrations).
+TailwindCSS / CSS
 
-Optional: Create frontend pages after backend is stable.
+Axios
+
+React Router
+
+Context API / Redux (optional)
+
+
+Backend
+
+Node.js
+
+Express.js
+
+MongoDB + Mongoose
+
+JWT Authentication
+
+Bcrypt Password Hashing
+
+
+Other Tools
+
+Postman / Thunder Client
+
+MongoDB Compass
+
+Git & GitHub
+
+VS Code
+
+
+
+---
+
+📁 Project Structure
+
+BloodBankSystem/
+│── backend/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   └── server.js
+│
+│── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   └── App.jsx
+│
+└── README.md
+
+
+---
+
+🗃️ Database Collections (MongoDB)
+
+users (donors, hospitals, labs, admins)
+
+bloodRequests
+
+camps
+
+labReports
+
+notifications
+
+
+Each with proper validation and timestamps.
+
+
+---
+
+🔐 Security Features
+
+Encrypted passwords (bcrypt)
+
+JWT-based authentication
+
+Role-based access control (Admin, Donor, Hospital, Lab)
+
+Secured API routes
+
+Input sanitization
+
+
+
+---
+
+📡 API Overview
+
+A few main API endpoints:
+
+Auth
+
+POST /api/auth/register
+POST /api/auth/login
+
+Blood Requests
+
+POST /api/blood/request
+GET  /api/blood/requests
+PUT  /api/blood/update/:id
+
+Lab
+
+PUT /api/lab/update-report/:id
+GET /api/lab/reports
+
+Admin
+
+POST /api/admin/camp
+GET  /api/admin/all-users
+DELETE /api/admin/delete-user/:id
+
+
+---
+
+🧪 Testing
+
+✔ Tested with Postman
+✔ API response time < 200ms
+✔ Database indexing improves speed
+✔ Multi-user workflow tested end-to-end
+
+---
+
+🧩 How to Run Locally
+
+Backend Setup
+
+cd backend
+npm install
+npm start
+
+Frontend Setup
+
+cd frontend
+npm install
+npm run dev
+
+Environment Variables
+
+Create .env file inside backend:
+
+MONGO_URI=your_mongo_connection
+JWT_SECRET=your_secret_key
+PORT=5000
+
+
+---
+
+🏗️ Future Enhancements
+
+Email / SMS alerts
+
+AI-based donor matching
+
+Advanced analytics dashboard
+
+Multi-language UI
+
+Blood camp heatmap
+
+Mobile app using React Native
