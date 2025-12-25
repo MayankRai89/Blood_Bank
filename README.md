@@ -72,7 +72,22 @@ JWT_SECRET=your_jwt_secret
 PORT=5000
 ```
 
-Start the backend server:
+### Important: Seed Admin Account (First Time Setup)
+
+Before starting the backend server for the first time, you must create an admin user.
+
+### Open the file: backend/seedAdmin.js
+Update the admin credentials inside the file:
+
+### Run the seed script from the backend folder:
+
+```bash
+node seedAdmin.js
+```
+
+This will create the admin account in the database.
+
+### Start the backend server:
 
 ```bash
 npm start
