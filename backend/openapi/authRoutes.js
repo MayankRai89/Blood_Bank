@@ -110,7 +110,6 @@
  *                   example: "Your error message here"
  */
 
-
 /**
  * @swagger
  * /api/auth/register:
@@ -187,7 +186,6 @@
  *                   type: string
  *                   example: "Your error message here"
  */
-
 
 /**
  * @swagger

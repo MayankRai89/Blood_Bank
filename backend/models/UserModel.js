@@ -2,73 +2,75 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: { 
-      type: String, 
-      required: true, 
-      trim: true 
-    },
-    email: { 
-      type: String, 
-      required: true, 
-      unique: true, 
-      lowercase: true, 
-      trim: true 
-    },
-    password: { 
-      type: String, 
+    name: {
+      type: String,
       required: true,
-      select: false  // Don’t include password in queries by default
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, "Please use a valid email"],
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false, // Don’t include password in queries by default
     },
     role: {
       type: String,
       enum: ["donor", "hospital", "admin"],
       required: true,
     },
-    phone: { 
+    phone: {
       type: String,
-      required: function() {
-        return this.role !== "admin"; // Admins might not need phone
-      }
+      required: function () {
+        return this.role !== "admin";
+      },
+      match: [/^[6-9][0-9]{9}$/, "Enter a valid phone number"],
     },
-    address: { 
+    address: {
       type: String,
-      required: function() {
+      required: function () {
         return this.role === "hospital"; // Hospitals need addresses
-      }
+      },
     },
 
     // Donor-specific fields
     bloodType: {
       type: String,
       enum: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      required: function() {
+      required: function () {
         return this.role === "donor";
-      }
+      },
     },
     healthInfo: {
       weight: { type: Number, min: 40, max: 200 }, // kg
       height: { type: Number, min: 140, max: 220 }, // cm
       hasDiseases: { type: Boolean, default: false },
-      diseaseDetails: { type: String }
+      diseaseDetails: { type: String },
     },
 
     // Hospital-specific fields
     hospitalInfo: {
-      licenseNumber: { 
+      licenseNumber: {
         type: String,
-        required: function() {
+        required: function () {
           return this.role === "hospital";
         },
         unique: true,
-        sparse: true
+        sparse: true,
       },
-      emergencyContact: { type: String }
+      emergencyContact: { type: String },
     },
   },
-  { 
+  {
     timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+    toObject: { virtuals: true },
+  },
 );
 export default mongoose.model("User", userSchema);

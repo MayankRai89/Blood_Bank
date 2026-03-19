@@ -22,7 +22,8 @@ const Contact = () => {
       <section className="py-20 mt-20 bg-gradient-to-r from-red-600 to-red-700 text-white text-center">
         <h1 className="text-5xl font-bold mb-4">Get in Touch</h1>
         <p className="text-xl opacity-90 max-w-2xl mx-auto">
-          We’re here to support you. Reach out to us for any help, queries, or blood-related assistance.
+          We’re here to support you. Reach out to us for any help, queries, or
+          blood-related assistance.
         </p>
       </section>
 
@@ -33,7 +34,7 @@ const Contact = () => {
           <div className="text-center shadow-md p-8 rounded-xl hover:shadow-xl transition">
             <Phone className="w-10 h-10 text-red-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Emergency Helpline</h3>
-            <p className="text-gray-600">+91 98765 43210</p>
+            <p className="text-gray-600">+91 12345 67890</p>
             <p className="text-gray-600">Available 24/7</p>
           </div>
 
@@ -41,16 +42,16 @@ const Contact = () => {
           <div className="text-center shadow-md p-8 rounded-xl hover:shadow-xl transition">
             <Mail className="w-10 h-10 text-red-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Email Us</h3>
-            <p className="text-gray-600">support@bloodconnect.org</p>
-            <p className="text-gray-600">info@bloodconnect.org</p>
+            <p className="text-gray-600">support@BloodDonor.org</p>
+            <p className="text-gray-600">info@BloodDonor.org</p>
           </div>
 
           {/* Office */}
           <div className="text-center shadow-md p-8 rounded-xl hover:shadow-xl transition">
             <MapPin className="w-10 h-10 text-red-600 mx-auto mb-4" />
             <h3 className="text-xl font-semibold mb-2">Head Office</h3>
-            <p className="text-gray-600">Navi Mumbai, Maharashtra</p>
-            <p className="text-gray-600">India - 410206</p>
+            <p className="text-gray-600">Jabalpur, Madhya Pradesh</p>
+            <p className="text-gray-600">India - 482003</p>
           </div>
         </div>
       </section>
@@ -60,9 +61,12 @@ const Contact = () => {
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 px-6">
           {/* Left Content */}
           <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Send Us a Message</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Send Us a Message
+            </h2>
             <p className="text-gray-600 mb-6">
-              Have any questions? We're always here to help you with blood donation, camp organization, or support queries.
+              Have any questions? We're always here to help you with blood
+              donation, camp organization, or support queries.
             </p>
 
             <div className="space-y-4">
@@ -72,11 +76,11 @@ const Contact = () => {
               </div>
               <div className="flex items-center">
                 <Mail className="text-red-600 mr-3" />
-                <span className="text-gray-700">support@bloodconnect.org</span>
+                <span className="text-gray-700">support@BloodDonor.org</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="text-red-600 mr-3" />
-                <span className="text-gray-700">Navi Mumbai, Maharashtra</span>
+                <span className="text-gray-700">Jabalpur, Madhya Pradesh</span>
               </div>
             </div>
 
@@ -96,7 +100,7 @@ const Contact = () => {
               <label className="font-medium text-gray-700">Full Name</label>
               <div className="flex items-center border rounded-lg px-3 mt-2">
                 <User className="text-gray-500 mr-2" />
-                <input  
+                <input
                   type="text"
                   placeholder="Enter your name"
                   className="w-full p-3 outline-none"
@@ -109,7 +113,7 @@ const Contact = () => {
               <label className="font-medium text-gray-700">Email Address</label>
               <div className="flex items-center border rounded-lg px-3 mt-2">
                 <Mail className="text-gray-500 mr-2" />
-                <input  
+                <input
                   type="email"
                   placeholder="Enter your email"
                   className="w-full p-3 outline-none"
@@ -122,7 +126,7 @@ const Contact = () => {
               <label className="font-medium text-gray-700">Phone Number</label>
               <div className="flex items-center border rounded-lg px-3 mt-2">
                 <Phone className="text-gray-500 mr-2" />
-                <input  
+                <input
                   type="text"
                   placeholder="Enter phone number"
                   className="w-full p-3 outline-none"

@@ -6,14 +6,18 @@ export const getDashboardStats = async (req, res) => {
   try {
     const totalDonors = await Donor.countDocuments();
     const totalFacilities = await Facility.countDocuments();
-    const pendingFacilities = await Facility.countDocuments({ status: "pending" });
-    const approvedFacilities = await Facility.countDocuments({ status: "approved" });
+    const pendingFacilities = await Facility.countDocuments({
+      status: "pending",
+    });
+    const approvedFacilities = await Facility.countDocuments({
+      status: "approved",
+    });
 
     // Count total donations across all donors
     const donors = await Donor.find({}, "donationHistory");
     const totalDonations = donors.reduce(
       (sum, donor) => sum + (donor.donationHistory?.length || 0),
-      0
+      0,
     );
 
     const activeDonors = await Donor.countDocuments({ isEligible: true });
@@ -58,7 +62,8 @@ export const getAllFacilities = async (req, res) => {
 export const approveFacility = async (req, res) => {
   try {
     const facility = await Facility.findById(req.params.id);
-    if (!facility) return res.status(404).json({ message: "Facility not found" });
+    if (!facility)
+      return res.status(404).json({ message: "Facility not found" });
 
     facility.status = "approved";
 
@@ -77,10 +82,12 @@ export const approveFacility = async (req, res) => {
 export const rejectFacility = async (req, res) => {
   try {
     const facility = await Facility.findById(req.params.id);
-    if (!facility) return res.status(404).json({ message: "Facility not found" });
+    if (!facility)
+      return res.status(404).json({ message: "Facility not found" });
 
     const { rejectionReason } = req.body;
-    if (!rejectionReason) return res.status(400).json({ message: "Rejection reason is required." });
+    if (!rejectionReason)
+      return res.status(400).json({ message: "Rejection reason is required." });
 
     facility.status = "rejected";
     facility.rejectionReason = rejectionReason;
@@ -89,7 +96,9 @@ export const rejectFacility = async (req, res) => {
 
     await facility.save();
 
-    res.status(200).json({ message: "Facility rejected and status updated", facility });
+    res
+      .status(200)
+      .json({ message: "Facility rejected and status updated", facility });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error rejecting facility" });

@@ -1,51 +1,51 @@
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import connectDB from "./config/db.js";
+
 import authRoutes from "./routes/authRoutes.js";
 import donorRoutes from "./routes/donorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import facilityRoutes from "./routes/facilityRoutes.js";
-import { swaggerUi, swaggerDocs } from "./openapi/index.js"
+import bloodLabRoutes from "./routes/bloodLabRoutes.js";
+import hospitalRoutes from "./routes/hospitalRoutes.js";
+
+import { swaggerUi, swaggerDocs } from "./openapi/index.js";
 
 dotenv.config();
-const app = express();
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
 app.use(express.json());
 
-app.use(cors({
-  origin: "http://localhost:5173", // or 3000
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "https://bloodbank-nfx7.vercel.app/",
+    credentials: true,
+  }),
+);
 
-app.use('/api/doc', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// Swagger docs
+app.use("/api/doc", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// 🧩 Routes
-
+// Routes
 app.use("/api/auth", authRoutes);
-
-
 app.use("/api/donor", donorRoutes);
-
 app.use("/api/facility", facilityRoutes);
-
 app.use("/api/admin", adminRoutes);
-
-
-
-import bloodLabRoutes from "./routes/bloodLabRoutes.js";
 app.use("/api/blood-lab", bloodLabRoutes);
-
-
-import hospitalRoutes from "./routes/hospitalRoutes.js";
 app.use("/api/hospital", hospitalRoutes);
 
+// Start server after DB connection
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+  } catch (error) {
+    console.error("❌ Server failed to start:", error);
+  }
+};
 
-// 🗄️ DB Connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected ✅"))
-  .catch((err) => console.log("MongoDB Error ❌", err));
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT} 🚀`));
+startServer();
