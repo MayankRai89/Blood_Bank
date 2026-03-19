@@ -18,11 +18,23 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
+// Middleware
 app.use(express.json());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://blood-bank-tan.vercel.app",
+];
 
 app.use(
   cors({
-    origin: "https://blood-bank-tan.vercel.app/",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS not allowed"));
+      }
+    },
     credentials: true,
   }),
 );
