@@ -48,16 +48,19 @@ Ensure you have the following installed locally:
 ### Installation Steps
 
 1. Clone the repository:
+
    ```bash
    git clone <repository-url>
    ```
 
 2. Navigate to the backend directory:
+
    ```bash
    cd blood-bank-management-system/backend
    ```
 
 3. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -73,6 +76,6 @@ Ensure you have the following installed locally:
 
 Access the Swagger UI for API documentation at:
 
-- `http://localhost:5000/api/doc`
+- `https://blood-bank-1-acmn.onrender.com/api/doc`
 
 This interface provides a detailed view of available endpoints and their usage.
