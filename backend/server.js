@@ -22,7 +22,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://bloodbank-nfx7.vercel.app/",
+    origin: "https://blood-bank-tan.vercel.app/",
     credentials: true,
   }),
 );
