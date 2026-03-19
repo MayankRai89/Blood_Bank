@@ -37,7 +37,9 @@ app.use("/api/facility", facilityRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/blood-lab", bloodLabRoutes);
 app.use("/api/hospital", hospitalRoutes);
-
+app.get("/", (req, res) => {
+  res.send("Blood Bank API is Running 🚀");
+});
 // Start server after DB connection
 const startServer = async () => {
   try {
