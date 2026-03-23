@@ -164,7 +164,7 @@ const Contact = () => {
         <iframe
           title="map"
           className="w-full h-96"
-          src="https://maps.google.com/maps?q=Navi%20Mumbai&t=&z=13&ie=UTF8&iwloc=&output=embed"
+          src="https://maps.google.com/maps?q=Navi%20Jabalpur&t=&z=13&ie=UTF8&iwloc=&output=embed"
           allowFullScreen
         ></iframe>
       </section>

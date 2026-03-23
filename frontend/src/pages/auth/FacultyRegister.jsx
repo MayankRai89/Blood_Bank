@@ -15,6 +15,7 @@ const FACILITY_CATEGORIES = [
 
 const STATES = {
   Maharashtra: ["Mumbai", "Pune", "Nagpur"],
+  Madhya Pradesh : ["Bhopal","Indore","Jablpur", "Satna", "Nagpur"],
   Karnataka: ["Bengaluru", "Mysore", "Mangalore"],
   Delhi: ["New Delhi", "Dwarka", "Rohini"],
   "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
@@ -303,7 +304,7 @@ export default function FacilityRegisterForm() {
     };
 
     // **YOUR TARGET URL**
-    const API_URL = "https://blood-bank-1-acmn.onrender.com/api/auth/register";
+    const API_URL = "http://localhost:5000/api/auth/register";
 
     console.log("Submitting Data to Backend:", submissionPayload); // Use the new payload
 

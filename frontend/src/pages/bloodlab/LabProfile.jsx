@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 // NOTE: Using localStorage and hardcoded URL for API connection as per previous context.
-const API_BASE_URL = "https://blood-bank-1-acmn.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 // Define a default structured object for operating hours
 const defaultOperatingHours = {
@@ -52,7 +52,11 @@ const LabProfile = () => {
 
   // Utility function to safely initialize operating hours as an object
   const initializeOperatingHours = (hoursData) => {
-    if (hoursData && typeof hoursData === 'object' && !Array.isArray(hoursData)) {
+    if (
+      hoursData &&
+      typeof hoursData === "object" &&
+      !Array.isArray(hoursData)
+    ) {
       return {
         weekdays: hoursData.weekdays || "",
         weekends: hoursData.weekends || "",
@@ -65,7 +69,7 @@ const LabProfile = () => {
 
   const validateField = (name, value) => {
     const newErrors = { ...errors };
-    const path = name.includes('.') ? name : name;
+    const path = name.includes(".") ? name : name;
 
     switch (path) {
       case "phone":
@@ -129,7 +133,9 @@ const LabProfile = () => {
             pincode: data.facility.address?.pincode || "",
           },
           contactPerson: data.facility.contactPerson || "",
-          operatingHours: initializeOperatingHours(data.facility.operatingHours), // Mapped to object
+          operatingHours: initializeOperatingHours(
+            data.facility.operatingHours,
+          ), // Mapped to object
         });
       } else {
         throw new Error(data.message);
@@ -200,8 +206,8 @@ const LabProfile = () => {
       toast.error("Please fix validation errors before saving");
       return;
     }
-    
-    // Prepare data payload, excluding internal state keys if necessary, 
+
+    // Prepare data payload, excluding internal state keys if necessary,
     // but current formData structure aligns with the necessary updates.
     const payload = formData;
 
@@ -221,7 +227,7 @@ const LabProfile = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (data.success) {
@@ -276,7 +282,9 @@ const LabProfile = () => {
           <h2 className="text-xl font-semibold text-gray-700 mb-2">
             Loading Laboratory Profile
           </h2>
-          <p className="text-gray-500">Preparing your facility information...</p>
+          <p className="text-gray-500">
+            Preparing your facility information...
+          </p>
         </div>
       </div>
     );
@@ -310,7 +318,6 @@ const LabProfile = () => {
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-white p-6">
       <Toaster />
       <div className="max-w-6xl mx-auto">
-        
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6 mb-6">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -324,12 +331,14 @@ const LabProfile = () => {
                 </h1>
                 <p className="text-gray-600 mt-1 flex items-center gap-2">
                   <FlaskConical size={16} className="text-red-500" />
-                  {facility.facilityCategory?.toUpperCase() || "BLOOD LAB"} • 
-                  <span className="font-mono text-sm">{facility.registrationNumber}</span>
+                  {facility.facilityCategory?.toUpperCase() || "BLOOD LAB"} •
+                  <span className="font-mono text-sm">
+                    {facility.registrationNumber}
+                  </span>
                 </p>
               </div>
             </div>
-            
+
             <div className="flex gap-3">
               {isEditing ? (
                 <>
@@ -365,10 +374,8 @@ const LabProfile = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
           {/* Left Sidebar - Verification Details and Quick Contact */}
           <div className="lg:col-span-1 space-y-6">
-            
             {/* Status Card */}
             <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -378,27 +385,34 @@ const LabProfile = () => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Status</span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                    facility.status === "approved"
-                      ? "bg-green-100 text-green-700"
-                      : facility.status === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-red-100 text-red-700"
-                  }`}>
-                    {facility.status?.charAt(0).toUpperCase() + facility.status?.slice(1)}
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      facility.status === "approved"
+                        ? "bg-green-100 text-green-700"
+                        : facility.status === "pending"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    {facility.status?.charAt(0).toUpperCase() +
+                      facility.status?.slice(1)}
                   </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Category</span>
-                  <span className="text-sm font-medium text-gray-800">{facility.facilityCategory || "N/A"}</span>
+                  <span className="text-sm font-medium text-gray-800">
+                    {facility.facilityCategory || "N/A"}
+                  </span>
                 </div>
-                
+
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-gray-600">Registration</span>
-                  <span className="text-sm font-mono text-gray-800">{facility.registrationNumber}</span>
+                  <span className="text-sm font-mono text-gray-800">
+                    {facility.registrationNumber}
+                  </span>
                 </div>
-                
+
                 {facility.approvedAt && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Approved On</span>
@@ -430,7 +444,9 @@ const LabProfile = () => {
                 {facility.emergencyContact && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-red-500" />
-                    <span className="text-gray-600">Emergency: {facility.emergencyContact}</span>
+                    <span className="text-gray-600">
+                      Emergency: {facility.emergencyContact}
+                    </span>
                   </div>
                 )}
               </div>
@@ -440,7 +456,6 @@ const LabProfile = () => {
           {/* Main Content - Editable Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6">
-              
               {/* General Facility Details (Name, Category) */}
               <div className="mb-8">
                 <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
@@ -448,7 +463,6 @@ const LabProfile = () => {
                   Facility Profile
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
                   {/* Name Input */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -498,7 +512,6 @@ const LabProfile = () => {
                   Contact Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
                   {/* Phone Number */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -518,7 +531,9 @@ const LabProfile = () => {
                       placeholder="10-digit phone number"
                     />
                     {errors.phone && (
-                      <p className="text-red-500 text-xs mt-2">{errors.phone}</p>
+                      <p className="text-red-500 text-xs mt-2">
+                        {errors.phone}
+                      </p>
                     )}
                   </div>
 
@@ -541,7 +556,9 @@ const LabProfile = () => {
                       placeholder="Emergency contact number"
                     />
                     {errors.emergencyContact && (
-                      <p className="text-red-500 text-xs mt-2">{errors.emergencyContact}</p>
+                      <p className="text-red-500 text-xs mt-2">
+                        {errors.emergencyContact}
+                      </p>
                     )}
                   </div>
 
@@ -575,7 +592,10 @@ const LabProfile = () => {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {["street", "city", "state", "pincode"].map((field) => (
-                    <div key={field} className={field === "street" ? "md:col-span-2" : ""}>
+                    <div
+                      key={field}
+                      className={field === "street" ? "md:col-span-2" : ""}
+                    >
                       <label className="block text-sm font-medium text-gray-700 mb-2 capitalize">
                         {field === "pincode" ? "PIN Code" : field}
                       </label>
@@ -590,12 +610,16 @@ const LabProfile = () => {
                             ? "border-gray-300 bg-white focus:ring-2 focus:ring-red-500 focus:border-red-500"
                             : "bg-gray-50 border-gray-200"
                         } ${
-                          field === "pincode" && errors["address.pincode"] ? "border-red-500" : ""
+                          field === "pincode" && errors["address.pincode"]
+                            ? "border-red-500"
+                            : ""
                         }`}
                         placeholder={`Enter ${field === "pincode" ? "PIN code" : field}`}
                       />
                       {field === "pincode" && errors["address.pincode"] && (
-                        <p className="text-red-500 text-xs mt-2">{errors["address.pincode"]}</p>
+                        <p className="text-red-500 text-xs mt-2">
+                          {errors["address.pincode"]}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -609,7 +633,6 @@ const LabProfile = () => {
                   Operating Hours
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  
                   {/* Weekdays */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">

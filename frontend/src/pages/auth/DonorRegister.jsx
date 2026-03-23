@@ -9,6 +9,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const STATES = {
   Maharashtra: ["Mumbai", "Pune", "Nagpur"],
+  Madhya Pradesh : ["Bhopal","Indore","Jablpur", "Satna", "Nagpur"],
   Karnataka: ["Bengaluru", "Mysuru", "Mangalore"],
   Gujarat: ["Ahmedabad", "Surat", "Vadodara"],
   Delhi: ["New Delhi", "Rohini", "Dwarka"],
@@ -290,7 +291,7 @@ export default function DonorRegisterForm() {
       role: "donor",
     };
 
-    const API_URL = "https://blood-bank-1-acmn.onrender.com/api/auth/register";
+    const API_URL = "http://localhost:5000/api/auth/register";
 
     console.log("Submitting Donor Data:", submissionPayload);
 

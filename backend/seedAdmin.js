@@ -4,20 +4,24 @@ import Admin from "./models/adminModel.js";
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("MongoDB connected ✅"))
-  .catch(err => console.error(err));
+  .catch((err) => console.error(err));
 
 const seedAdmin = async () => {
   try {
     // Remove existing admin with same email
-    await Admin.deleteMany({ email: "suraj@admin.com" });
+    await Admin.deleteMany({ email: "admin@admin.com" });
 
     // Create new admin
     const admin = new Admin({
-      name: "Suraj Savle",
-      email: "suraj@admin.com",
-      password: "bbms@admin", // will be hashed automatically
+      name: "Mayank Rai",
+      email: "admin@admin.com",
+      password: "admin@admin", // will be hashed automatically
       role: "admin",
     });
 

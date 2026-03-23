@@ -18,7 +18,10 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("https://blood-bank-1-acmn.onrender.com/api/auth/register", formData);
+      const res = await axios.post(
+        "http://localhost:5000/api/auth/register",
+        formData,
+      );
       alert("✅ Registered Successfully!");
       navigate("/login"); // redirect after success
     } catch (err) {
@@ -29,8 +32,10 @@ export default function Register() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Create Account</h2>
-        
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          Create Account
+        </h2>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name */}
           <div>

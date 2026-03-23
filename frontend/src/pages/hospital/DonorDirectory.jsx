@@ -53,7 +53,7 @@ const DonorDirectory = () => {
       });
 
       const res = await axios.get(
-        `https://blood-bank-1-acmn.onrender.com/api/hospital/donors?${queryParams}`,
+        `http://localhost:5000/api/hospital/donors?${queryParams}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
@@ -84,7 +84,7 @@ const DonorDirectory = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://blood-bank-1-acmn.onrender.com/api/hopital/donors/${donorId}/contact`,
+        `http://localhost:5000/api/hopital/donors/${donorId}/contact`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -283,6 +283,7 @@ const DonorDirectory = () => {
                 >
                   <option value="all">All Cities</option>
                   <option value="Mumbai">Mumbai</option>
+                  <option value="Madhya pradesh">Madhya Pradesh</option>
                   <option value="Delhi">Delhi</option>
                   <option value="Bangalore">Bangalore</option>
                   <option value="Chennai">Chennai</option>
