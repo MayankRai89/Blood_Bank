@@ -15,7 +15,7 @@ const FACILITY_CATEGORIES = [
 
 const STATES = {
   Maharashtra: ["Mumbai", "Pune", "Nagpur"],
-  Madhya Pradesh : ["Bhopal","Indore","Jablpur", "Satna", "Nagpur"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Jabalpur", "Satna", "Nagpur"],
   Karnataka: ["Bengaluru", "Mysore", "Mangalore"],
   Delhi: ["New Delhi", "Dwarka", "Rohini"],
   "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],

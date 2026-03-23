@@ -9,7 +9,7 @@ const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 const STATES = {
   Maharashtra: ["Mumbai", "Pune", "Nagpur"],
-  Madhya Pradesh : ["Bhopal","Indore","Jablpur", "Satna", "Nagpur"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Jablpur", "Satna", "Nagpur"],
   Karnataka: ["Bengaluru", "Mysuru", "Mangalore"],
   Gujarat: ["Ahmedabad", "Surat", "Vadodara"],
   Delhi: ["New Delhi", "Rohini", "Dwarka"],
