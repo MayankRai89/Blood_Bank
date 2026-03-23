@@ -19,7 +19,7 @@ export default function Register() {
     e.preventDefault();
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://blood-bank-1-acmn.onrender.com/api/auth/register",
         formData,
       );
       alert("✅ Registered Successfully!");

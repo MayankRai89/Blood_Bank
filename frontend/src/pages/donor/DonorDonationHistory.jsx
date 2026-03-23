@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-const API_URL = "http://localhost:5000/api/donor";
+const API_URL = "https://blood-bank-1-acmn.onrender.com/api/donor";
 
 const DonorDonationHistory = () => {
   const [history, setHistory] = useState([]);

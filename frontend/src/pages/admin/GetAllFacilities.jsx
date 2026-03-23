@@ -20,7 +20,7 @@ import {
   Building2,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000/api/admin";
+const API_URL = "https://blood-bank-1-acmn.onrender.com/api/admin";
 
 function GetAllFacilities() {
   const [facilities, setFacilities] = useState([]);

@@ -34,12 +34,15 @@ const AdminDashboard = () => {
 
       console.log("🔄 Fetching admin dashboard stats...");
 
-      const res = await fetch("http://localhost:5000/api/admin/dashboard", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+      const res = await fetch(
+        "https://blood-bank-1-acmn.onrender.com/api/admin/dashboard",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       console.log("📨 Dashboard response status:", res.status);
 
