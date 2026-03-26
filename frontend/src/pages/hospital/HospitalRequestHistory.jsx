@@ -13,7 +13,7 @@ const HospitalRequestHistory = () => {
         setLoading(true);
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "https://blood-bank-1-acmn.onrender.com/api/hospital/blood/requests",
+          "http://localhost:5000/api/hospital/blood/requests",
           {
             headers: { Authorization: `Bearer ${token}` },
           },

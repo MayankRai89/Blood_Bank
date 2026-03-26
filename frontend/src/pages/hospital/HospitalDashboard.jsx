@@ -42,7 +42,7 @@ const HospitalDashboard = () => {
 
         // Fetch hospital profile
         const profileRes = await fetch(
-          "https://blood-bank-1-acmn.onrender.com/api/facility/profile",
+          "http://localhost:5000/api/facility/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -65,7 +65,7 @@ const HospitalDashboard = () => {
 
         // Fetch blood stock
         const stockRes = await axios.get(
-          "https://blood-bank-1-acmn.onrender.com/api/hospital/blood/stock",
+          "http://localhost:5000/api/hospital/blood/stock",
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -73,7 +73,7 @@ const HospitalDashboard = () => {
 
         // Fetch blood requests
         const requestsRes = await axios.get(
-          "https://blood-bank-1-acmn.onrender.com/api/hospital/blood/requests",
+          "http://localhost:5000/api/hospital/blood/requests",
           {
             headers: { Authorization: `Bearer ${token}` },
           },

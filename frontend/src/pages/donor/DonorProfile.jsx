@@ -25,7 +25,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-const API_BASE_URL = "https://blood-bank-1-acmn.onrender.com/api";
+const API_BASE_URL = "http://localhost:5000/api";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"];
 const GENDER_OPTIONS = [

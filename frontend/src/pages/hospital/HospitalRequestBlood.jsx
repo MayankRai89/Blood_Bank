@@ -20,12 +20,9 @@ const HospitalRequestBlood = () => {
       try {
         setLabsLoading(true);
         const token = localStorage.getItem("token");
-        const res = await axios.get(
-          "https://blood-bank-1-acmn.onrender.com/api/facility/labs",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await axios.get("http://localhost:5000/api/facility/labs", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setLabs(res.data.labs || []);
         console.log("Labs loaded:", res.data.labs);
       } catch (err) {
@@ -46,7 +43,7 @@ const HospitalRequestBlood = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "https://blood-bank-1-acmn.onrender.com/api/hospital/blood/request",
+        "http://localhost:5000/api/hospital/blood/request",
         form,
         { headers: { Authorization: `Bearer ${token}` } },
       );
