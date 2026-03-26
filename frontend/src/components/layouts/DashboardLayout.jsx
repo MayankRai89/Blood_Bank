@@ -201,9 +201,12 @@ const DashboardLayout = ({ userRole = "donor" }) => {
 
       while (attempt < maxRetries) {
         try {
-          const res = await fetch("http://localhost:5000/api/auth/profile", {
-            headers: { Authorization: `Bearer ${token}` },
-          });
+          const res = await fetch(
+            "https://blood-bank-urer.onrender.com/api/auth/profile",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
 
           if (res.ok) {
             const data = await res.json();

@@ -304,7 +304,7 @@ export default function FacilityRegisterForm() {
     };
 
     // **YOUR TARGET URL**
-    const API_URL = "http://localhost:5000/api/auth/register";
+    const API_URL = "https://blood-bank-urer.onrender.com/api/auth/register";
 
     console.log("Submitting Data to Backend:", submissionPayload); // Use the new payload
 
