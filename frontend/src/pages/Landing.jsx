@@ -10,7 +10,6 @@ import {
   Search,
   Bell,
   Calendar,
-  activity,
   FileText,
   Award,
   CheckCircle,
@@ -77,7 +76,7 @@ const LandingPage = () => {
     },
     {
       step: "04",
-      icon: activity,
+      icon: Activity,
       title: "Donate & Save Lives",
       description: "Visit approved centers and make your life-saving donation",
     },
