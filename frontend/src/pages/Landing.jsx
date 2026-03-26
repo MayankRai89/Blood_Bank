@@ -10,6 +10,7 @@ import {
   Search,
   Bell,
   Calendar,
+  activity,
   FileText,
   Award,
   CheckCircle,
@@ -76,6 +77,7 @@ const LandingPage = () => {
     },
     {
       step: "04",
+      icon: activity,
       title: "Donate & Save Lives",
       description: "Visit approved centers and make your life-saving donation",
     },
@@ -272,8 +274,8 @@ const LandingPage = () => {
                     blood.need === "Critical"
                       ? "text-red-600"
                       : blood.need === "High"
-                      ? "text-orange-500"
-                      : "text-green-500"
+                        ? "text-orange-500"
+                        : "text-green-500"
                   }`}
                 >
                   {blood.type}
@@ -283,8 +285,8 @@ const LandingPage = () => {
                     blood.need === "Critical"
                       ? "bg-red-100 text-red-700"
                       : blood.need === "High"
-                      ? "bg-orange-100 text-orange-700"
-                      : "bg-green-100 text-green-700"
+                        ? "bg-orange-100 text-orange-700"
+                        : "bg-green-100 text-green-700"
                   }`}
                 >
                   {blood.need} Need
