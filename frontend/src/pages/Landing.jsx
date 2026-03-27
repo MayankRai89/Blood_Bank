@@ -193,12 +193,12 @@ const LandingPage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/auth">
+              <Link to="/login">
                 <button className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-xl bg-white text-red-700 hover:bg-red-50 transition-all duration-300 shadow-lg hover:shadow-xl">
                   Get Started <ArrowRight className="w-4 h-4 ml-2" />
                 </button>
               </Link>
-              <Link to="#about">
+              <Link to="/about">
                 <button className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-xl border-2 border-white text-white hover:bg-white/10 transition-all duration-300">
                   Learn More
                 </button>
@@ -562,7 +562,7 @@ const LandingPage = () => {
             together to ensure blood is available when and where it's needed
             most.
           </p>
-          <Link to="/auth">
+          <Link to="/login">
             <button className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-xl bg-white text-red-700 hover:bg-red-50 transition-all duration-300 shadow-lg hover:shadow-xl">
               Join Today <ArrowRight className="w-4 h-4 ml-2" />
             </button>
