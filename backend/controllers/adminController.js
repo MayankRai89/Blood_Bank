@@ -1,5 +1,6 @@
 import Donor from "../models/donorModel.js";
 import Facility from "../models/facilityModel.js";
+import BloodCamp from "../models/bloodCampModel.js";
 
 // 🧩 Get Dashboard Overview Stats
 export const getDashboardStats = async (req, res) => {
@@ -21,6 +22,9 @@ export const getDashboardStats = async (req, res) => {
     );
 
     const activeDonors = await Donor.countDocuments({ isEligible: true });
+    const upcomingCamps = await BloodCamp.countDocuments({
+      status: { $in: ["Upcoming", "Ongoing"] },
+    });
 
     res.status(200).json({
       totalDonors,
@@ -29,7 +33,7 @@ export const getDashboardStats = async (req, res) => {
       pendingFacilities,
       totalDonations,
       activeDonors,
-      upcomingCamps: 3, // Placeholder
+      upcomingCamps,
     });
   } catch (err) {
     console.error("Admin Stats Error:", err);
@@ -55,6 +59,53 @@ export const getAllFacilities = async (req, res) => {
     res.status(200).json({ facilities });
   } catch (err) {
     res.status(500).json({ message: "Error fetching facilities" });
+  }
+};
+
+export const getAllCamps = async (req, res) => {
+  try {
+    const camps = await BloodCamp.find()
+      .populate("hospital", "name email phone facilityType address")
+      .sort({ date: -1, createdAt: -1 });
+
+    res.status(200).json({ camps });
+  } catch (err) {
+    console.error("Get All Camps Error:", err);
+    res.status(500).json({ message: "Error fetching camps" });
+  }
+};
+
+export const getAllDonations = async (req, res) => {
+  try {
+    const donors = await Donor.find()
+      .select("fullName email bloodGroup donationHistory")
+      .populate("donationHistory.facility", "name facilityType address");
+
+    const donations = donors
+      .flatMap((donor) =>
+        (donor.donationHistory || []).map((donation, index) => ({
+          id: donation._id || `${donor._id}-${index}`,
+          donorId: donor._id,
+          donorName: donor.fullName,
+          donorEmail: donor.email,
+          donorBloodGroup: donor.bloodGroup,
+          donationDate: donation.donationDate,
+          bloodGroup: donation.bloodGroup || donor.bloodGroup,
+          quantity: donation.quantity || 1,
+          remarks: donation.remarks || "",
+          verified: Boolean(donation.verified),
+          facility: donation.facility?.name || "Unknown facility",
+          facilityType: donation.facility?.facilityType || "",
+          city: donation.facility?.address?.city || "",
+          state: donation.facility?.address?.state || "",
+        })),
+      )
+      .sort((a, b) => new Date(b.donationDate) - new Date(a.donationDate));
+
+    res.status(200).json({ donations });
+  } catch (err) {
+    console.error("Get All Donations Error:", err);
+    res.status(500).json({ message: "Error fetching donation history" });
   }
 };
 

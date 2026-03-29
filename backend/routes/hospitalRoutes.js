@@ -1,23 +1,23 @@
 import express from "express";
 import {
-  getDonorCamps,
-  getDonorHistory,
-  getDonorProfile,
-  getDonorStats,
-  updateDonorProfile,
-} from "../controllers/donorController.js";
-import { protectDonor } from "../middlewares/donorMiddleware.js";
+  getAllDonors,
+  getHospitalDashboard,
+  getHospitalHistory,
+  getHospitalRequests,
+  getHospitalStock,
+  hospitalRequestBlood,
+  logContactAttempt,
+} from "../controllers/hospitalController.js";
+import { protectFacility } from "../middlewares/facilityMiddleware.js";
 
 const router = express.Router();
 
-router.get("/profile", protectDonor, getDonorProfile);
-
-router.put("/profile", protectDonor, updateDonorProfile);
-
-router.get("/camps", protectDonor, getDonorCamps);
-
-router.get("/history", protectDonor, getDonorHistory);
-
-router.get("/stats", protectDonor, getDonorStats);
+router.get("/dashboard", protectFacility, getHospitalDashboard);
+router.get("/blood/stock", protectFacility, getHospitalStock);
+router.get("/blood/requests", protectFacility, getHospitalRequests);
+router.post("/blood/request", protectFacility, hospitalRequestBlood);
+router.get("/history", protectFacility, getHospitalHistory);
+router.get("/donors", protectFacility, getAllDonors);
+router.post("/donors/:id/contact", protectFacility, logContactAttempt);
 
 export default router;

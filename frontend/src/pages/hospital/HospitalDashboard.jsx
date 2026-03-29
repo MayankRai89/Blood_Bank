@@ -14,7 +14,6 @@ import {
   TrendingUp,
   RefreshCw,
 } from "lucide-react";
-import axios from "axios";
 
 const HospitalDashboard = () => {
   const [hospital, setHospital] = useState(null);
@@ -40,47 +39,33 @@ const HospitalDashboard = () => {
           return;
         }
 
-        // Fetch hospital profile
-        const profileRes = await fetch(
-          "https://blood-bank-urer.onrender.com/api/facility/profile",
+        const dashboardRes = await fetch(
+          "https://blood-bank-urer.onrender.com/api/hospital/dashboard",
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           },
         );
 
-        console.log("Facility getProfile route hit!");
+        console.log("Hospital dashboard response status:", dashboardRes.status);
 
-        if (!profileRes.ok) {
+        if (!dashboardRes.ok) {
           throw new Error("Failed to fetch hospital data");
         }
 
-        const profileData = await profileRes.json();
-        console.log("Hospital API response:", profileData);
+        const dashboardData = await dashboardRes.json();
+        console.log("Hospital dashboard API response:", dashboardData);
 
-        const h = profileData.hospital || profileData.facility || profileData;
+        const h = dashboardData.hospital;
 
         if (!h) {
           throw new Error("No hospital data found in response");
         }
 
-        // Fetch blood stock
-        const stockRes = await axios.get(
-          "https://blood-bank-urer.onrender.com/api/hospital/blood/stock",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        // Fetch blood requests
-        const requestsRes = await axios.get(
-          "https://blood-bank-urer.onrender.com/api/hospital/blood/requests",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        const stockData = stockRes.data.data || [];
-        const requestsData = requestsRes.data.data || [];
+        const stockData = dashboardData.inventory || [];
+        const requestsData = dashboardData.recentRequests || [];
 
         // Calculate stats
         const totalUnits = stockData.reduce(
@@ -117,11 +102,13 @@ const HospitalDashboard = () => {
         setBloodStock(stockData);
         setRequests(requestsData);
         setStats({
-          totalUnits,
+          totalUnits: dashboardData.stats?.totalUnits ?? totalUnits,
           lowStock,
           expiringSoon,
-          pendingRequests,
-          totalRequests: requestsData.length,
+          pendingRequests:
+            dashboardData.stats?.pendingRequests ?? pendingRequests,
+          totalRequests:
+            dashboardData.stats?.totalRequests ?? requestsData.length,
         });
       } catch (err) {
         console.error("Error fetching hospital data:", err);

@@ -1,7 +1,30 @@
 import { toast } from "react-hot-toast";
 
+const normalizeBase64Url = (value) => {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = normalized.length % 4;
+
+  if (padding === 0) return normalized;
+
+  return normalized.padEnd(normalized.length + (4 - padding), "=");
+};
+
+const decodeJwtPayload = (token) => {
+  const parts = token.split(".");
+
+  if (parts.length !== 3) {
+    throw new Error("Invalid token format");
+  }
+
+  return JSON.parse(atob(normalizeBase64Url(parts[1])));
+};
+
+export const normalizeRole = (role = "") =>
+  role.toLowerCase().replace(/[_\s]/g, "-");
+
 export const handleAuthError = (navigate) => {
   localStorage.removeItem("token");
+  localStorage.removeItem("role");
   toast.error("Authentication error: Session expired. Please login again.");
   navigate("/login");
 };
@@ -59,13 +82,10 @@ export const isTokenValid = () => {
   if (!token) return false;
   
   try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return false;
-    
-    const payload = JSON.parse(atob(parts[1]));
+    const payload = decodeJwtPayload(token);
     const currentTime = Date.now() / 1000;
     
-    return payload.exp > currentTime;
+    return typeof payload.exp === "number" && payload.exp > currentTime;
   } catch (error) {
     console.error('Token validation error:', error);
     return false;

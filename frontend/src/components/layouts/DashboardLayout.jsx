@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { normalizeRole } from "../../utils/auth";
 import {
   Bell,
   LogOut,
@@ -32,6 +33,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
   const [userData, setUserData] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Added loading state
+  const [loadError, setLoadError] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -189,6 +191,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
   useEffect(() => {
     const fetchUserData = async () => {
       setIsLoading(true); // Start loading
+      setLoadError("");
       const token = localStorage.getItem("token");
       if (!token) {
         navigate("/login");
@@ -216,15 +219,20 @@ const DashboardLayout = ({ userRole = "donor" }) => {
               throw new Error("User data structure invalid.");
             }
 
-            if (user.role.toLowerCase() !== userRole.toLowerCase()) {
+            const expectedRole = normalizeRole(userRole);
+            const actualRole = normalizeRole(user.role);
+
+            if (actualRole !== expectedRole) {
               console.error(
                 `Role mismatch: expected ${userRole}, got ${user.role}`,
               );
               localStorage.removeItem("token");
+              localStorage.removeItem("role");
               navigate("/login");
               return;
             }
 
+            localStorage.setItem("role", user.role);
             setUserData(user);
             setIsLoading(false); // Success
             return;
@@ -232,9 +240,12 @@ const DashboardLayout = ({ userRole = "donor" }) => {
             // Unauthorized/Forbidden
             console.error("Authentication failed or token expired.");
             localStorage.removeItem("token");
+            localStorage.removeItem("role");
             navigate("/login");
             setIsLoading(false);
             return;
+          } else {
+            throw new Error(`Profile request failed with status ${res.status}`);
           }
         } catch (error) {
           console.error(
@@ -254,8 +265,9 @@ const DashboardLayout = ({ userRole = "donor" }) => {
 
       // If all attempts fail
       console.error("All attempts to fetch user data failed.");
-      localStorage.removeItem("token");
-      navigate("/login");
+      setLoadError(
+        "We could not verify your session right now. Please retry in a moment.",
+      );
       setIsLoading(false);
     };
 
@@ -282,6 +294,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
@@ -300,6 +313,26 @@ const DashboardLayout = ({ userRole = "donor" }) => {
           <p className="mt-4 text-gray-600 font-semibold">
             Loading Dashboard...
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white border border-red-100 rounded-2xl shadow-lg p-6 text-center">
+          <AlertTriangle className="w-10 h-10 text-red-600 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            Session Check Failed
+          </h2>
+          <p className="text-gray-600 mb-5">{loadError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );

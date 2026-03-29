@@ -17,6 +17,8 @@ import BloodStock from "./pages/bloodlab/BloodStock";
 import LabProfile from "./pages/bloodlab/LabProfile";
 import GetAllFacilities from "./pages/admin/GetAllFacilities";
 import GetAllDonors from "./pages/admin/GetAllDonors";
+import AdminCamps from "./pages/admin/AdminCamps";
+import AdminDonations from "./pages/admin/AdminDonations";
 import DonorCampsList from "./pages/donor/DonorCampsList";
 import LabManageRequests from "./pages/bloodlab/LabManageRequests";
 import HospitalRequestBlood from "./pages/hospital/HospitalRequestBlood";
@@ -68,6 +70,8 @@ function App() {
           <Route path="verification" element={<AdminFacilities />} />
           <Route path="donors" element={<GetAllDonors />} />
           <Route path="facilities" element={<GetAllFacilities />} />
+          <Route path="camps" element={<AdminCamps />} />
+          <Route path="donations" element={<AdminDonations />} />
         </Route>
       </Routes>
   );
