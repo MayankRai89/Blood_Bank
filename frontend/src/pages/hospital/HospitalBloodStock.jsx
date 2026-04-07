@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import {
   Droplet,
   Plus,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 
 const HospitalBloodStock = () => {
+  const navigate = useNavigate();
   const [stock, setStock] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -271,9 +273,7 @@ const HospitalBloodStock = () => {
                 Request blood from blood labs to build your inventory
               </p>
               <button
-                onClick={() =>
-                  (window.location.href = "/hospital/request-blood")
-                }
+                onClick={() => navigate("/hospital/blood-request-create")}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
               >
                 Request Blood
@@ -457,9 +457,7 @@ const HospitalBloodStock = () => {
             </h3>
             <div className="space-y-3">
               <button
-                onClick={() =>
-                  (window.location.href = "/hospital/request-blood")
-                }
+                onClick={() => navigate("/hospital/blood-request-create")}
                 className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
               >
                 <Plus size={18} />

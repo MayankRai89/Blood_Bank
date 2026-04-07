@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 
@@ -152,9 +152,9 @@ export default function Login() {
 
         <p className="mt-6 text-center text-gray-600 text-sm">
           Don't have an account?{" "}
-          <a href="/" className="text-red-600 font-medium hover:underline">
+          <Link to="/" className="text-red-600 font-medium hover:underline">
             Register
-          </a>
+          </Link>
         </p>
       </div>
     </div>

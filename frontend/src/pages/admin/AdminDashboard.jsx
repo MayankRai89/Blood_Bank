@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Users,
   Hospital,
@@ -18,6 +19,7 @@ import {
 import { toast } from "react-hot-toast";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -28,7 +30,7 @@ const AdminDashboard = () => {
 
       const token = localStorage.getItem("token");
       if (!token) {
-        window.location.href = "/login";
+        navigate("/login", { replace: true });
         return;
       }
 
@@ -193,7 +195,7 @@ const AdminDashboard = () => {
       </p>
 
       <button
-        onClick={() => (window.location.href = href)}
+        onClick={() => navigate(href)}
         className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium"
       >
         {buttonText}
