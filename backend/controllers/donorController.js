@@ -1,10 +1,10 @@
 import Donor from "../models/donorModel.js";
-// Assuming you have a Facility model for population, and BloodCamp model for camps
-import Facility from "../models/facilityModel.js"; // Placeholder import
-import BloodCamp from "../models/bloodCampModel.js"; // Placeholder import
-import mongoose from "mongoose"; // Needed for ObjectId in aggregation
+import Facility from "../models/facilityModel.js";
+import BloodCamp from "../models/bloodCampModel.js";
+import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import Blood from "../models/bloodModel.js";
+import { sendDonationNotification } from "../services/notificationService.js";
 
 // /* 👤 Get Donor Profile */
 export const getDonorProfile = async (req, res) => {
@@ -420,21 +420,50 @@ export const searchDonor = async (req, res) => {
 };
 
 /**
+ * @desc Get all available donors (eligible to donate)
+ * @route GET /api/blood-lab/donors/available
+ * @access Private (Blood Lab)
+ */
+export const getAvailableDonors = async (req, res) => {
+  try {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    const donors = await Donor.find({
+      $or: [
+        { lastDonationDate: { $exists: false } },
+        { lastDonationDate: null },
+        { lastDonationDate: { $lte: threeMonthsAgo } },
+      ],
+    })
+      .select(
+        "fullName email phone bloodGroup lastDonationDate donationHistory",
+      )
+      .limit(50)
+      .sort({ lastDonationDate: 1 }); // Show those who haven't donated in a long time first
+
+    res.status(200).json({ success: true, donors });
+  } catch (err) {
+    console.error("Get available donors error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+/**
  * @desc Mark donation
  * @route POST /api/blood-lab/donors/donate/:id
- * @access Private (Blood Lab)
+ * @access Private (Blood Lab / Hospital)
  */
 export const markDonation = async (req, res) => {
   try {
     const donorId = req.params.id;
-    const labId = req.user._id;
+    const facilityId = req.user._id;
     const { quantity = 1, remarks = "", bloodGroup } = req.body;
 
-    const donor = await Donor.findById(donorId);
-    if (!donor) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Donor not found" });
+    const facility = await Facility.findById(facilityId);
+    if (!facility) {
+      return res.status(404).json({ success: false, message: "Facility not found" });
     }
 
     // Check if donor can donate (3 months gap)
@@ -461,10 +490,11 @@ export const markDonation = async (req, res) => {
     }
 
     // Add to donation history
+    const bloodType = bloodGroup || donor.bloodGroup;
     donor.donationHistory.push({
       donationDate: new Date(),
-      facility: labId,
-      bloodGroup: bloodGroup || donor.bloodGroup,
+      facility: facilityId,
+      bloodGroup: bloodType,
       quantity,
       remarks,
       verified: true,
@@ -473,11 +503,11 @@ export const markDonation = async (req, res) => {
     await donor.save();
 
     // Add to facility history
-    await Facility.findByIdAndUpdate(labId, {
+    await Facility.findByIdAndUpdate(facilityId, {
       $push: {
         history: {
           eventType: "Donation",
-          description: `Recorded donation from ${donor.fullName} - ${quantity} unit(s) of ${bloodGroup || donor.bloodGroup}`,
+          description: `Recorded donation from ${donor.fullName} - ${quantity} unit(s) of ${bloodType}`,
           date: new Date(),
           referenceId: donor._id,
         },
@@ -485,12 +515,19 @@ export const markDonation = async (req, res) => {
     });
 
     // Add to blood stock
-    const bloodType = bloodGroup || donor.bloodGroup;
-    await addToBloodStock(labId, bloodType, quantity);
+    await addToBloodStock(facilityId, bloodType, quantity, facility.facilityType === "hospital");
+
+    // Send Notification
+    await sendDonationNotification({
+      donor,
+      facilityName: facility.name || facility.facilityName,
+      quantity,
+      bloodGroup: bloodType
+    });
 
     res.status(200).json({
       success: true,
-      message: "Donation recorded successfully",
+      message: "Donation recorded successfully and notification sent",
       donor,
     });
   } catch (err) {
@@ -583,9 +620,10 @@ export const getRecentDonations = async (req, res) => {
 };
 
 // Helper function to add to blood stock
-const addToBloodStock = async (labId, bloodType, quantity) => {
+const addToBloodStock = async (facilityId, bloodType, quantity, isHospital = false) => {
   try {
-    let stock = await Blood.findOne({ bloodGroup: bloodType, bloodLab: labId });
+    const query = isHospital ? { bloodGroup: bloodType, hospital: facilityId } : { bloodGroup: bloodType, bloodLab: facilityId };
+    let stock = await Blood.findOne(query);
 
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 42);
@@ -595,12 +633,17 @@ const addToBloodStock = async (labId, bloodType, quantity) => {
       stock.expiryDate = expiryDate;
       await stock.save();
     } else {
-      await Blood.create({
+      const stockData = {
         bloodGroup: bloodType,
         quantity,
-        expiryDate,
-        bloodLab: labId,
-      });
+        expiryDate
+      };
+      if (isHospital) {
+        stockData.hospital = facilityId;
+      } else {
+        stockData.bloodLab = facilityId;
+      }
+      await Blood.create(stockData);
     }
   } catch (error) {
     console.error("Error adding to blood stock:", error);

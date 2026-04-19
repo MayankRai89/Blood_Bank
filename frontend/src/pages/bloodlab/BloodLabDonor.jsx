@@ -33,10 +33,28 @@ const BloodLabDonor = () => {
     total: 0,
   });
 
+  // Load available donors
+  const loadAvailableDonors = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        "https://blood-bank-urer.onrender.com/api/blood-lab/donors/available",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setResults(res.data.donors || []);
+    } catch (err) {
+      console.error("Failed to load available donors:", err);
+      toast.error("Failed to load available donors");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Search donors
   const searchDonors = async () => {
     if (!term.trim()) {
-      toast.error("Please enter search term");
+      loadAvailableDonors();
       return;
     }
 
@@ -77,6 +95,7 @@ const BloodLabDonor = () => {
 
   useEffect(() => {
     loadRecentDonations();
+    loadAvailableDonors();
   }, []);
 
   // Open donation form
@@ -200,7 +219,7 @@ const BloodLabDonor = () => {
             <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6 mb-6">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <Search className="w-5 h-5 text-red-600" />
-                Search Donors
+                {term.trim() ? "Search Results" : "Available Donors"}
               </h2>
 
               <div className="flex gap-3 mb-4">
@@ -214,7 +233,10 @@ const BloodLabDonor = () => {
                     placeholder="Search by name, email, phone number..."
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     value={term}
-                    onChange={(e) => setTerm(e.target.value)}
+                    onChange={(e) => {
+                      setTerm(e.target.value);
+                      if (!e.target.value.trim()) loadAvailableDonors();
+                    }}
                     onKeyPress={(e) => e.key === "Enter" && searchDonors()}
                   />
                 </div>

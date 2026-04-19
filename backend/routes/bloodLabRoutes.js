@@ -15,7 +15,7 @@ import {
   getAllLabs,
 } from "../controllers/bloodLabController.js";
 import { protectFacility } from "../middlewares/facilityMiddleware.js";
-import { getRecentDonations, markDonation, searchDonor } from "../controllers/donorController.js";
+import { getRecentDonations, markDonation, searchDonor, getAvailableDonors } from "../controllers/donorController.js";
 
 const router = express.Router();
 
@@ -45,6 +45,7 @@ router.get("/labs", protectFacility, getAllLabs);
 
 // Add these routes to your bloodLabRoutes.js
 router.get("/donors/search", protectFacility, searchDonor);
+router.get("/donors/available", protectFacility, getAvailableDonors);
 router.post("/donors/donate/:id", protectFacility, markDonation);
 router.get("/donations/recent", protectFacility, getRecentDonations);
 

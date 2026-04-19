@@ -8,6 +8,7 @@ import {
   hospitalRequestBlood,
   logContactAttempt,
 } from "../controllers/hospitalController.js";
+import { markDonation } from "../controllers/donorController.js";
 import { protectFacility } from "../middlewares/facilityMiddleware.js";
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.post("/blood/request", protectFacility, hospitalRequestBlood);
 router.get("/history", protectFacility, getHospitalHistory);
 router.get("/donors", protectFacility, getAllDonors);
 router.post("/donors/:id/contact", protectFacility, logContactAttempt);
+router.post("/donors/:id/donate", protectFacility, markDonation);
 
 export default router;

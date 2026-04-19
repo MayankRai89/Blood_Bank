@@ -33,6 +33,12 @@ const DonorDirectory = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState(null);
   const [showContactModal, setShowContactModal] = useState(false);
+  const [showDonationForm, setShowDonationForm] = useState(false);
+  const [donationData, setDonationData] = useState({
+    quantity: 1,
+    remarks: "",
+    bloodGroup: "",
+  });
   const [stats, setStats] = useState({
     total: 0,
     available: 0,
@@ -84,12 +90,45 @@ const DonorDirectory = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://blood-bank-urer.onrender.com/api/hopital/donors/${donorId}/contact`,
+        `https://blood-bank-urer.onrender.com/api/hospital/donors/${donorId}/contact`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
       );
     } catch (err) {
       console.error("Log contact error:", err);
+    }
+  };
+
+  // Open donation form
+  const openDonationForm = (donor) => {
+    setSelectedDonor(donor);
+    setDonationData({
+      quantity: 1,
+      remarks: "",
+      bloodGroup: donor.bloodGroup,
+    });
+    setShowDonationForm(true);
+  };
+
+  // Mark donation
+  const markDonation = async () => {
+    if (!selectedDonor) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `https://blood-bank-urer.onrender.com/api/hospital/donors/${selectedDonor._id}/donate`,
+        donationData,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      toast.success("Donation recorded and notification sent!");
+      setShowDonationForm(false);
+      setSelectedDonor(null);
+      fetchDonors(); // Refresh search results
+    } catch (err) {
+      console.error("Donation error:", err);
+      toast.error(err.response?.data?.message || "Failed to record donation");
     }
   };
 
@@ -455,15 +494,24 @@ const DonorDirectory = () => {
                     </div>
                   </div>
 
-                  {/* Contact Button */}
-                  <button
-                    onClick={() => contactDonor(donor)}
-                    disabled={availability.status === "unavailable"}
-                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                  >
-                    <PhoneCall size={16} />
-                    Contact Donor
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => contactDonor(donor)}
+                      className="flex-1 bg-white border border-red-200 text-red-600 hover:bg-red-50 py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <PhoneCall size={16} />
+                      Contact
+                    </button>
+                    <button
+                      onClick={() => openDonationForm(donor)}
+                      disabled={availability.status === "unavailable"}
+                      className="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Droplet size={16} />
+                      Donate
+                    </button>
+                  </div>
                 </div>
               );
             })}
@@ -551,6 +599,108 @@ const DonorDirectory = () => {
               >
                 Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Donation Modal */}
+        {showDonationForm && selectedDonor && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                Record Donation
+              </h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Donor
+                  </label>
+                  <p className="font-semibold text-gray-800">
+                    {selectedDonor.fullName}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {selectedDonor.email} | {selectedDonor.phone}
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Blood Group
+                  </label>
+                  <select
+                    value={donationData.bloodGroup}
+                    onChange={(e) =>
+                      setDonationData({
+                        ...donationData,
+                        bloodGroup: e.target.value,
+                      })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  >
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quantity (Units)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="2"
+                    value={donationData.quantity}
+                    onChange={(e) =>
+                      setDonationData({
+                        ...donationData,
+                        quantity: parseInt(e.target.value),
+                      })
+                    }
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Remarks (Optional)
+                  </label>
+                  <textarea
+                    value={donationData.remarks}
+                    onChange={(e) =>
+                      setDonationData({
+                        ...donationData,
+                        remarks: e.target.value,
+                      })
+                    }
+                    rows={3}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="Any additional notes..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={markDonation}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg transition-colors"
+                >
+                  Confirm Donation
+                </button>
+                <button
+                  onClick={() => setShowDonationForm(false)}
+                  className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
         )}
