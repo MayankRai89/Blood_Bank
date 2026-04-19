@@ -29,9 +29,11 @@ import DonorDirectory from "./pages/hospital/DonorDirectory";
 import About from "./components/about/About";
 import Contact from "./components/contact/Contact";
 import DonorDonationHistory from "./pages/donor/DonorDonationHistory";
+import Chatbot from "./components/Chatbot";
 
 function App() {
   return (
+      <>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
@@ -74,6 +76,8 @@ function App() {
           <Route path="donations" element={<AdminDonations />} />
         </Route>
       </Routes>
+      <Chatbot />
+      </>
   );
 }
 
