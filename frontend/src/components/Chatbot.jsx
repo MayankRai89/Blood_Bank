@@ -45,48 +45,143 @@ export default function Chatbot() {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  useEffect(() => {
-    if (isOpen) {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem("role");
+  const updateChatbotContext = async () => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    let basePrompt = "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\nThroughout the session, dynamically learn from the user's previous questions and use this chat history context to train your responses for a better, more conversational flow.\n\n";
 
-      if (token && role === "donor") {
-        fetch("https://blood-bank-urer.onrender.com/api/donor/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            const donorData = data.donor || data;
-            let dynamicPrompt =
-              "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\n";
+    if (!token) {
+      basePrompt += `Current Status: Unauthenticated/Guest User.
+Instructions:
+1. If the user asks about their own personal data, blood records, or eligibility, politely inform them that they must log in to get information about themselves.
+2. You can freely answer general medical questions, blood donation advice, or system FAQs.`;
+      
+      setMessages(prev => {
+        const sysMsg = prev[0]?.content || "";
+        if (sysMsg.includes("Current Logged-In User Information")) {
+            return [
+              { role: "system", content: basePrompt },
+              { role: "assistant", content: "You've been logged out. I have cleared your data from my training context. How can I assist you as a guest today?" }
+            ];
+        }
+        const newMessages = [...prev];
+        if (newMessages.length > 0) newMessages[0].content = basePrompt;
+        return newMessages;
+      });
+      return;
+    }
 
-            dynamicPrompt += `Current Logged-In User Information:
-- Name: ${donorData.name || "User"}
-- Role: Donor
+    try {
+      let dynamicPrompt = basePrompt + `Current Logged-In User Information:\n- Role: ${role ? role.toUpperCase() : "UNKNOWN"}\n`;
+
+      if (role === "donor") {
+        const res = await fetch("https://blood-bank-urer.onrender.com/api/donor/profile", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const donorData = data.donor || data;
+        
+        dynamicPrompt += `- Name: ${donorData.name || "User"}
 - Blood Type: ${donorData.bloodGroup || "Unknown"}
 - Eligible to Donate: ${donorData.eligibleToDonate ? "Yes" : "No"}
 - Next Eligible Date: ${donorData.nextEligibleDate ? new Date(donorData.nextEligibleDate).toLocaleDateString() : "N/A"}
 - Last Donation Date: ${donorData.lastDonationDate ? new Date(donorData.lastDonationDate).toLocaleDateString() : "N/A"}
 - Total Donations: ${donorData.totalDonations || 0}\n\n`;
 
-            dynamicPrompt += `Important Instructions:
+        dynamicPrompt += `Important Instructions:
 1. Do not list or expose the user's details proactively. Keep them hidden and only use them if the user specifically asks a related question (e.g., "Am I eligible to donate?", "What's my blood type?").
 2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with a short, personalized greeting like "Hi ${donorData.name || "there"}! What can I do for you today?". Do not provide any other details in that initial response.`;
 
-            setMessages((prev) => {
-              const newMessages = [...prev];
-              // Update the system message which is always the first one
-              if (newMessages[0].role === "system") {
-                newMessages[0].content = dynamicPrompt;
-              }
-              return newMessages;
-            });
-          })
-          .catch((err) =>
-            console.error("Error fetching donor profile for chatbot:", err),
-          );
+      } else if (role === "hospital") {
+        const res = await fetch("https://blood-bank-urer.onrender.com/api/hospital/dashboard", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const h = data.hospital || {};
+        const stockData = data.inventory || [];
+        const totalUnits = stockData.reduce((sum, item) => sum + item.quantity, 0);
+
+        dynamicPrompt += `- Hospital Name: ${h.name || "Hospital"}
+- Status: ${h.status || "Unknown"}
+- Location: ${h.address?.city || "Unknown"}
+- Blood Units Inventory: ${totalUnits} total units\n\n`;
+
+        dynamicPrompt += `Important Instructions:
+1. Provide accurate hospital inventory and request details if the user asks for it.
+2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with "Welcome, ${h.name || "Hospital Admin"}! What details or blood inventories can I assist you with today?"`;
+
+      } else if (role === "bloodlab") {
+        const [dashRes, stockRes] = await Promise.all([
+          fetch("https://blood-bank-urer.onrender.com/api/blood-lab/dashboard", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("https://blood-bank-urer.onrender.com/api/blood-lab/blood/stock", { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+        const dashData = await dashRes.json();
+        const stockDataRaw = await stockRes.json();
+        const l = dashData.facility || {};
+        
+        let stockArr = [];
+        if (stockDataRaw.data) stockArr = stockDataRaw.data;
+        else if (stockDataRaw.stock) stockArr = stockDataRaw.stock;
+        else if (Array.isArray(stockDataRaw)) stockArr = stockDataRaw;
+        
+        const totalUnits = stockArr.reduce((sum, item) => sum + (item.quantity || 0), 0);
+
+        dynamicPrompt += `- Laboratory Name: ${l.name || "Blood Lab"}
+- Status: ${l.status || "Unknown"}
+- Location: ${l.address?.city || "Unknown"}
+- Total Blood Stock Units: ${totalUnits}\n\n`;
+
+        dynamicPrompt += `Important Instructions:
+1. Provide accurate laboratory stock details and data if the user asks for it.
+2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with "Welcome, ${l.name || "Lab Admin"}! How can I assist you with your operations and stock today?"`;
+      } else {
+        dynamicPrompt += `- Additional role context is not mapped. Answer general platform queries.\n`;
       }
+
+      setMessages(prev => {
+        const sysMsg = prev[0]?.content || "";
+        if (sysMsg.includes("Unauthenticated/Guest User")) {
+            return [
+              { role: "system", content: dynamicPrompt },
+              { role: "assistant", content: "Authentication detected! How can I assist you with your data today?" }
+            ];
+        }
+        const newMessages = [...prev];
+        if (newMessages.length > 0) newMessages[0].content = dynamicPrompt;
+        return newMessages;
+      });
+
+    } catch (err) {
+      console.error("Error fetching context for chatbot:", err);
     }
+  };
+
+  useEffect(() => {
+    let intervalId;
+    if (isOpen) {
+      updateChatbotContext();
+      
+      // Monitor logout/login changes passively
+      intervalId = setInterval(() => {
+        const currentToken = localStorage.getItem("token");
+        setMessages(prev => {
+          const sysMsg = prev[0]?.content || "";
+          if (!currentToken && sysMsg.includes("Current Logged-In User Information")) {
+             setTimeout(updateChatbotContext, 0); 
+          } else if (currentToken && sysMsg.includes("Unauthenticated/Guest User")) {
+             setTimeout(updateChatbotContext, 0); 
+          }
+          return prev;
+        });
+      }, 2000);
+    } else {
+       // Update context unassumingly so it's ready when opened
+       updateChatbotContext();
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [isOpen]);
 
   const scrollToBottom = () => {
