@@ -52,14 +52,15 @@ export default function Chatbot() {
 
       if (token && role === "donor") {
         fetch("https://blood-bank-urer.onrender.com/api/donor/profile", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         })
-        .then(res => res.json())
-        .then(data => {
-          const donorData = data.donor || data;
-          let dynamicPrompt = "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\n";
+          .then((res) => res.json())
+          .then((data) => {
+            const donorData = data.donor || data;
+            let dynamicPrompt =
+              "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\n";
 
-          dynamicPrompt += `Current Logged-In User Information:
+            dynamicPrompt += `Current Logged-In User Information:
 - Name: ${donorData.name || "User"}
 - Role: Donor
 - Blood Type: ${donorData.bloodGroup || "Unknown"}
@@ -68,20 +69,22 @@ export default function Chatbot() {
 - Last Donation Date: ${donorData.lastDonationDate ? new Date(donorData.lastDonationDate).toLocaleDateString() : "N/A"}
 - Total Donations: ${donorData.totalDonations || 0}\n\n`;
 
-          dynamicPrompt += `Important Instructions:
+            dynamicPrompt += `Important Instructions:
 1. Do not list or expose the user's details proactively. Keep them hidden and only use them if the user specifically asks a related question (e.g., "Am I eligible to donate?", "What's my blood type?").
 2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with a short, personalized greeting like "Hi ${donorData.name || "there"}! What can I do for you today?". Do not provide any other details in that initial response.`;
 
-          setMessages(prev => {
-            const newMessages = [...prev];
-            // Update the system message which is always the first one
-            if (newMessages[0].role === "system") {
-              newMessages[0].content = dynamicPrompt;
-            }
-            return newMessages;
-          });
-        })
-        .catch(err => console.error("Error fetching donor profile for chatbot:", err));
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              // Update the system message which is always the first one
+              if (newMessages[0].role === "system") {
+                newMessages[0].content = dynamicPrompt;
+              }
+              return newMessages;
+            });
+          })
+          .catch((err) =>
+            console.error("Error fetching donor profile for chatbot:", err),
+          );
       }
     }
   }, [isOpen]);
@@ -260,7 +263,7 @@ export default function Chatbot() {
                 </svg>
               </div>
               <div className="cb-bot-info">
-                <h1>Groq AI Bot</h1>
+                <h1>Blood Connect Support</h1>
                 <span className="cb-status">
                   <span className="cb-status-dot"></span>
                   Online
