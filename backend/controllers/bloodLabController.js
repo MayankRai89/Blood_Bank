@@ -10,6 +10,48 @@ import BloodRequest from "../models/bloodRequestModel.js";
    ============================================================== */
 
 /**
+ * Helper: Auto-update past camps to Completed
+ */
+const autoCompleteCamps = async (labId) => {
+  const now = new Date();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const activeCamps = await BloodCamp.find({
+    hospital: labId,
+    status: { $in: ["Upcoming", "Ongoing"] },
+    date: { $lte: today }
+  });
+
+  for (const camp of activeCamps) {
+    let isCompleted = false;
+    
+    // Check if the date is fully in the past
+    if (camp.date < today) {
+      isCompleted = true;
+    } else if (camp.time && camp.time.end) {
+      // If it's today, check if current time is past the end time
+      try {
+        const [endHour, endMin] = camp.time.end.split(':').map(Number);
+        const currentHour = now.getHours();
+        const currentMin = now.getMinutes();
+        
+        if (currentHour > endHour || (currentHour === endHour && currentMin >= endMin)) {
+          isCompleted = true;
+        }
+      } catch (e) {
+        console.error("Error parsing camp time:", e);
+      }
+    }
+
+    if (isCompleted) {
+      camp.status = "Completed";
+      await camp.save();
+    }
+  }
+};
+
+/**
  * @desc Get Blood Lab Dashboard Stats + Recent Camps
  * @route GET /api/bloodlabs/dashboard
  * @access Private (Blood Lab)
@@ -18,11 +60,13 @@ export const getBloodLabDashboard = async (req, res) => {
   try {
     const labId = req.user?._id;
 
+    // Auto-update past camps
+    await autoCompleteCamps(labId);
+
     const [camps, stock, facility] = await Promise.all([
       BloodCamp.find({ hospital: labId }).sort({ createdAt: -1 }),
       Blood.find({ bloodLab: labId }),
-      // FIX: Select the history field
-      Facility.findById(labId).select('history name email phone address operatingHours status lastLogin') // select relevant fields
+      Facility.findById(labId).select('history name email phone address operatingHours status lastLogin')
     ]);
 
     const totalCamps = camps.length;
@@ -42,7 +86,7 @@ export const getBloodLabDashboard = async (req, res) => {
         totalUnits
       },
       recentCamps,
-      facility: facility // Now includes history as fallback
+      facility: facility
     });
   } catch (error) {
     console.error("Dashboard Error:", error);
@@ -160,6 +204,10 @@ export const createBloodCamp = async (req, res) => {
 export const getBloodLabCamps = async (req, res) => {
   try {
     const labId = req.user._id;
+    
+    // Auto-update past camps
+    await autoCompleteCamps(labId);
+    
     const { status, page = 1, limit = 10 } = req.query;
 
     const filter = { hospital: labId };
