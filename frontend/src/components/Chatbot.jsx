@@ -62,7 +62,7 @@ Instructions:
         if (sysMsg.includes("Current Logged-In User Information")) {
             return [
               { role: "system", content: basePrompt },
-              { role: "assistant", content: "You've been logged out. I have cleared your data from my training context. How can I assist you as a guest today?" }
+              { role: "assistant", content: "Hello! I am your BloodConnect Support. How can I assist you today?" }
             ];
         }
         const newMessages = [...prev];
@@ -144,7 +144,7 @@ Instructions:
         if (sysMsg.includes("Unauthenticated/Guest User")) {
             return [
               { role: "system", content: dynamicPrompt },
-              { role: "assistant", content: "Authentication detected! How can I assist you with your data today?" }
+              { role: "assistant", content: "Hello! I am your BloodConnect Support. How can I assist you today?" }
             ];
         }
         const newMessages = [...prev];
