@@ -49,7 +49,7 @@ export default function Chatbot() {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     
-    let basePrompt = "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\nThroughout the session, dynamically learn from the user's previous questions and use this chat history context to train your responses for a better, more conversational flow.\n\n";
+    let basePrompt = "You are BloodConnect Support, a helpful, versatile, and knowledgeable AI assistant. You can answer questions on any topic, including those outside of medical fields. However, if you are providing medical information, you must always remind the user that you are an AI and not a certified doctor.\n\nThroughout the session, dynamically learn from the user's previous questions and use this chat history context to train your responses for a better, more conversational flow.\n\n";
 
     if (!token) {
       basePrompt += `Current Status: Unauthenticated/Guest User.
@@ -76,22 +76,34 @@ Instructions:
       let dynamicPrompt = basePrompt + `Current Logged-In User Information:\n- Role: ${role ? role.toUpperCase() : "UNKNOWN"}\n`;
 
       if (role === "donor") {
-        const res = await fetch("https://blood-bank-urer.onrender.com/api/donor/profile", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await res.json();
-        const donorData = data.donor || data;
+        const [profileRes, historyRes] = await Promise.all([
+          fetch("https://blood-bank-urer.onrender.com/api/donor/profile", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("https://blood-bank-urer.onrender.com/api/donor/history", { headers: { Authorization: `Bearer ${token}` } })
+        ]);
         
-        dynamicPrompt += `- Name: ${donorData.name || "User"}
+        const profileData = await profileRes.json();
+        const historyDataPayload = await historyRes.json();
+        const donorData = profileData.donor || profileData;
+        
+        let historyData = [];
+        if (historyDataPayload.history) historyData = historyDataPayload.history;
+        else if (historyDataPayload.donations) historyData = historyDataPayload.donations;
+        else if (Array.isArray(historyDataPayload)) historyData = historyDataPayload;
+        
+        const totalDonations = historyData.length;
+        const totalCamps = historyData.filter(h => h.campId || (h.facility && h.facility.toLowerCase().includes("camp"))).length;
+        
+        dynamicPrompt += `- Name: ${donorData.fullName || donorData.name || "User"}
 - Blood Type: ${donorData.bloodGroup || "Unknown"}
 - Eligible to Donate: ${donorData.eligibleToDonate ? "Yes" : "No"}
 - Next Eligible Date: ${donorData.nextEligibleDate ? new Date(donorData.nextEligibleDate).toLocaleDateString() : "N/A"}
 - Last Donation Date: ${donorData.lastDonationDate ? new Date(donorData.lastDonationDate).toLocaleDateString() : "N/A"}
-- Total Donations: ${donorData.totalDonations || 0}\n\n`;
+- Total Times Donated Blood: ${totalDonations}
+- Total Camps Attended: ${totalCamps}\n\n`;
 
         dynamicPrompt += `Important Instructions:
-1. Do not list or expose the user's details proactively. Keep them hidden and only use them if the user specifically asks a related question (e.g., "Am I eligible to donate?", "What's my blood type?").
-2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with a short, personalized greeting like "Hi ${donorData.name || "there"}! What can I do for you today?". Do not provide any other details in that initial response.`;
+1. Do not list or expose the user's details proactively. Keep them hidden and only use them if the user specifically asks a related question (e.g., "Am I eligible to donate?", "How many times have I donated?", "What is my donation history?").
+2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with a short greeting like "Hi User! What can I do for you today?". Do NOT use their actual name in the greeting.`;
 
       } else if (role === "hospital") {
         const res = await fetch("https://blood-bank-urer.onrender.com/api/hospital/dashboard", {
