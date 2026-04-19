@@ -26,6 +26,45 @@ export const getDashboardStats = async (req, res) => {
       status: { $in: ["Upcoming", "Ongoing"] },
     });
 
+    // 📈 Calculate Growth Data (Last 6 Months)
+    const growthData = [];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const monthName = months[d.getMonth()];
+      const year = d.getFullYear();
+      const monthIndex = d.getMonth();
+
+      const startOfMonth = new Date(year, monthIndex, 1);
+      const endOfMonth = new Date(year, monthIndex + 1, 0, 23, 59, 59);
+
+      // Count new donors in this month
+      const monthlyDonors = await Donor.countDocuments({
+        createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+      });
+
+      // Count donations in this month
+      const donorsWithDonations = await Donor.find({
+        "donationHistory.donationDate": { $gte: startOfMonth, $lte: endOfMonth },
+      }, "donationHistory");
+
+      let monthlyDonations = 0;
+      donorsWithDonations.forEach(donor => {
+        monthlyDonations += (donor.donationHistory || []).filter(history => {
+          const donationDate = new Date(history.donationDate);
+          return donationDate >= startOfMonth && donationDate <= endOfMonth;
+        }).length;
+      });
+
+      growthData.push({
+        name: monthName,
+        donors: monthlyDonors,
+        donations: monthlyDonations,
+      });
+    }
+
     res.status(200).json({
       totalDonors,
       totalFacilities,
@@ -34,6 +73,7 @@ export const getDashboardStats = async (req, res) => {
       totalDonations,
       activeDonors,
       upcomingCamps,
+      growthData,
     });
   } catch (err) {
     console.error("Admin Stats Error:", err);
