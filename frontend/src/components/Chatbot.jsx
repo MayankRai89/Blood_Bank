@@ -59,13 +59,18 @@ export default function Chatbot() {
           const donorData = data.donor || data;
           let dynamicPrompt = "You are BloodConnect Support, a helpful and knowledgeable medical AI assistant. You may provide general health, wellness, and medical information. However, you must always remind the user that you are an AI, not a certified doctor, and that they must consult a healthcare professional before acting on any medical information you provide.\n\n";
 
-          dynamicPrompt += `Current Logged-In User Information (Use this to give personalized answers):
+          dynamicPrompt += `Current Logged-In User Information:
+- Name: ${donorData.name || "User"}
 - Role: Donor
 - Blood Type: ${donorData.bloodGroup || "Unknown"}
 - Eligible to Donate: ${donorData.eligibleToDonate ? "Yes" : "No"}
 - Next Eligible Date: ${donorData.nextEligibleDate ? new Date(donorData.nextEligibleDate).toLocaleDateString() : "N/A"}
 - Last Donation Date: ${donorData.lastDonationDate ? new Date(donorData.lastDonationDate).toLocaleDateString() : "N/A"}
-- Total Donations: ${donorData.totalDonations || 0}`;
+- Total Donations: ${donorData.totalDonations || 0}\n\n`;
+
+          dynamicPrompt += `Important Instructions:
+1. Do not list or expose the user's details proactively. Keep them hidden and only use them if the user specifically asks a related question (e.g., "Am I eligible to donate?", "What's my blood type?").
+2. If the user says "hi", "hello", or offers a simple greeting, respond strictly with a short, personalized greeting like "Hi ${donorData.name || "there"}! What can I do for you today?". Do not provide any other details in that initial response.`;
 
           setMessages(prev => {
             const newMessages = [...prev];
