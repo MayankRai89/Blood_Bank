@@ -14,6 +14,7 @@ import {
   XCircle,
   AlertTriangle,
 } from "lucide-react";
+import socket from "../../socket";
 
 const API_URL = "https://blood-bank-urer.onrender.com/api/admin";
 
@@ -70,6 +71,18 @@ function AdminCamps() {
 
   useEffect(() => {
     fetchCamps();
+
+    socket.connect();
+    const handleCampUpdated = () => {
+      console.log("Real-time update: Camp updated!");
+      fetchCamps(false);
+    };
+
+    socket.on("camp-updated", handleCampUpdated);
+
+    return () => {
+      socket.off("camp-updated", handleCampUpdated);
+    };
   }, []);
 
   const filteredCamps = camps

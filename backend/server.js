@@ -1,6 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
 import connectDB from "./config/db.js";
 
 import authRoutes from "./routes/authRoutes.js";
@@ -39,6 +41,31 @@ app.use(
   }),
 );
 
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log(`⚡ Socket Connected: ${socket.id}`);
+
+  // When a user logs in, they can join their facility's room
+  socket.on("join-room", (roomId) => {
+    socket.join(roomId);
+    console.log(`User ${socket.id} joined room: ${roomId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`Socket Disconnected: ${socket.id}`);
+  });
+});
+
+app.set("io", io);
+
 // Swagger docs
 app.use("/api/doc", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
@@ -56,7 +83,7 @@ app.get("/", (req, res) => {
 const startServer = async () => {
   try {
     await connectDB();
-    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   } catch (error) {
     console.error("❌ Server failed to start:", error);
   }

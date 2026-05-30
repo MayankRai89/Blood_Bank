@@ -1,4 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
+import socket from "./socket";
 import Login from "./pages/auth/Login";
 import LandingPage from "./pages/Landing";
 import FacilityForm from "./pages/auth/FacultyRegister";
@@ -32,6 +35,35 @@ import DonorDonationHistory from "./pages/donor/DonorDonationHistory";
 import Chatbot from "./components/Chatbot";
 
 function App() {
+  useEffect(() => {
+    // Connect socket if user is logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+        const userId = payload.id || payload._id;
+        if (userId) {
+          socket.connect();
+          socket.emit("join-room", userId);
+        }
+      } catch (err) {
+        console.error("Socket Auth Error:", err);
+      }
+    }
+
+    // Listen for global real-time alerts
+    socket.on("low-stock-alert", (data) => {
+      toast.error(data.message, {
+        duration: 10000,
+        position: 'top-right',
+      });
+    });
+
+    return () => {
+      socket.off("low-stock-alert");
+    };
+  }, []);
+
   return (
       <>
       <Routes>

@@ -185,6 +185,9 @@ export const createBloodCamp = async (req, res) => {
       },
     });
 
+    const io = req.app.get("io");
+    if (io) io.emit("camp-updated");
+
     res.status(201).json({
       success: true,
       message: "Blood camp created successfully",
@@ -266,6 +269,9 @@ export const deleteBloodCamp = async (req, res) => {
       },
     });
 
+    const io = req.app.get("io");
+    if (io) io.emit("camp-updated");
+
     res.json({ success: true, message: "Camp deleted successfully" });
   } catch (error) {
     console.error("Delete Camp Error:", error);
@@ -317,6 +323,9 @@ export const updateBloodCamp = async (req, res) => {
         },
       },
     });
+
+    const io = req.app.get("io");
+    if (io) io.emit("camp-updated");
 
     res.json({
       success: true,
@@ -371,6 +380,9 @@ export const updateCampStatus = async (req, res) => {
         },
       },
     });
+
+    const io = req.app.get("io");
+    if (io) io.emit("camp-updated");
 
     res.json({
       success: true,
@@ -487,10 +499,22 @@ export const removeBloodStock = async (req, res) => {
     stock.quantity -= Number(quantity);
 
     // Remove the document if quantity becomes zero
-    if (stock.quantity === 0) {
+    if (stock.quantity <= 0) {
       await Blood.findByIdAndDelete(stock._id);
     } else {
       await stock.save();
+    }
+
+    // --- SOCKET.IO LOW STOCK ALERT ---
+    if (stock.quantity < 5) {
+      const io = req.app.get("io");
+      if (io) {
+        io.to(bloodLab.toString()).emit("low-stock-alert", {
+          message: `Low stock alert! Your ${bloodType} stock is down to ${stock.quantity} units.`,
+          bloodType,
+          quantity: stock.quantity
+        });
+      }
     }
 
     // Add to facility history
@@ -628,10 +652,22 @@ export const updateBloodRequestStatus = async (req, res) => {
       // Remove from lab stock
       labStock.quantity -= request.units;
       
-      if (labStock.quantity === 0) {
+      if (labStock.quantity <= 0) {
         await Blood.findByIdAndDelete(labStock._id);
       } else {
         await labStock.save();
+      }
+
+      // --- SOCKET.IO LOW STOCK ALERT ---
+      if (labStock.quantity < 5) {
+        const io = req.app.get("io");
+        if (io) {
+          io.to(labId.toString()).emit("low-stock-alert", {
+            message: `Low stock alert! Your ${request.bloodType} stock is down to ${labStock.quantity} units after fulfilling a request.`,
+            bloodType: request.bloodType,
+            quantity: labStock.quantity
+          });
+        }
       }
 
       // Add to hospital stock (create or update)
