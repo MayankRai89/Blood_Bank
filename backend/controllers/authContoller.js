@@ -9,10 +9,24 @@ import jwt from "jsonwebtoken";
  */
 export const register = async (req, res) => {
   try {
-    const { role } = req.body; // donor | hospital | blood-lab
+    const { email, role } = req.body; // donor | hospital | blood-lab
 
     if (!role) {
       return res.status(400).json({ message: "Role is required" });
+    }
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    // Check if user already exists in any collection
+    const existingUser = 
+      await Donor.findOne({ email }) || 
+      await Facility.findOne({ email }) || 
+      await Admin.findOne({ email });
+
+    if (existingUser) {
+      return res.status(400).json({ message: "Email is already registered" });
     }
 
     let user;
@@ -42,6 +56,15 @@ export const register = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Registration Error:", error);
+
+    // Handle duplicate key errors (e.g. duplicate email or registrationNumber)
+    if (error.code === 11000) {
+      const duplicateField = Object.keys(error.keyValue)[0];
+      return res.status(400).json({
+        message: `${duplicateField.charAt(0).toUpperCase() + duplicateField.slice(1)} is already registered.`,
+      });
+    }
+
     res
       .status(500)
       .json({ message: "Registration failed", error: error.message });
