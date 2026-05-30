@@ -466,6 +466,11 @@ export const markDonation = async (req, res) => {
       return res.status(404).json({ success: false, message: "Facility not found" });
     }
 
+    const donor = await Donor.findById(donorId);
+    if (!donor) {
+      return res.status(404).json({ success: false, message: "Donor not found" });
+    }
+
     // Check if donor can donate (3 months gap)
     if (donor.lastDonationDate) {
       const lastDonation = new Date(donor.lastDonationDate);
