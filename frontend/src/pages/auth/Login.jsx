@@ -80,79 +80,95 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-between bg-gradient-to-br from-red-50 via-gray-50 to-red-100">
       <Header />
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md border border-gray-200">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
-            Login to Blood Bank
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-8 w-full max-w-md border border-gray-100 transition-all">
+          <div className="flex justify-center mb-3">
+            <span className="inline-flex items-center gap-1.5 bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+              ✉️ Email ID Login
+            </span>
+          </div>
+
+          <h2 className="text-2xl font-extrabold text-center text-gray-900 mb-2">
+            Sign In with Email ID
           </h2>
-          <p className="text-center text-gray-500 mb-6 text-sm">
-            Access your donor, hospital, or lab dashboard using your registered Email ID
+          <p className="text-center text-gray-500 mb-6 text-xs">
+            Enter your registered Email ID and Password to access your dashboard
           </p>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-center text-sm">
-              <span className="mr-2">⚠</span>
+            <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded-xl mb-5 flex items-center text-xs">
+              <span className="mr-2 text-base">⚠️</span>
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
-                Email ID
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
+                Registered Email ID
               </label>
-              <input
-                type="email"
-                name="email"
-                placeholder="Enter your email address"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                disabled={loading}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition disabled:opacity-50 text-sm"
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="your.name@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition disabled:opacity-50 text-sm"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-800 mb-1">
+              <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
                 Password
               </label>
               <input
                 type="password"
                 name="password"
-                placeholder="Enter your password"
+                placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
                 required
                 disabled={loading}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition disabled:opacity-50 text-sm"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition disabled:opacity-50 text-sm"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm"
+              className="w-full py-3 mt-2 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold shadow-lg hover:from-red-700 hover:to-red-800 transition transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm gap-2"
             >
               {loading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Logging in...
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Authenticating...
                 </>
               ) : (
-                "Login"
+                <>
+                  ✉️ Login with Email ID
+                </>
               )}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-gray-600 text-sm">
-            Don't have an account?{" "}
-            <Link to="/register/donor" className="text-red-600 font-medium hover:underline">
-              Register
-            </Link>
-          </p>
+          <div className="mt-6 border-t border-gray-100 pt-4 text-center">
+            <p className="text-xs text-gray-500 mb-2">New to Blood Bank Portal?</p>
+            <div className="flex justify-center gap-3 text-xs font-semibold">
+              <Link to="/register/donor" className="text-red-600 hover:underline">
+                Donor Register
+              </Link>
+              <span className="text-gray-300">•</span>
+              <Link to="/register/facility" className="text-red-600 hover:underline">
+                Facility Register
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
