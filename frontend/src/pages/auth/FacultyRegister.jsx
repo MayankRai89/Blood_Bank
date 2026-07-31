@@ -918,6 +918,7 @@ export default function FacilityRegisterForm() {
           </div>
         </form>
       </div>
+      </div>
 
       <Footer />
     </div>
