@@ -14,6 +14,8 @@ import hospitalRoutes from "./routes/hospitalRoutes.js";
 
 import { swaggerUi, swaggerDocs } from "./openapi/index.js";
 
+import mongoose from "mongoose";
+
 dotenv.config();
 
 const app = express();
@@ -32,6 +34,17 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   }),
 );
+
+// DB readiness check middleware
+app.use("/api", (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    return res.status(503).json({
+      success: false,
+      message: "Database connection is unavailable. Please verify MONGO_URI in Render Environment Variables.",
+    });
+  }
+  next();
+});
 
 const server = http.createServer(app);
 const io = new Server(server, {
