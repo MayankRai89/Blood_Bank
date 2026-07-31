@@ -1,5 +1,7 @@
 {
   "rewrites": [
+    { "source": "/api/:path*", "destination": "https://blood-bank-urer.onrender.com/api/:path*" },
+    { "source": "/socket.io/:path*", "destination": "https://blood-bank-urer.onrender.com/socket.io/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

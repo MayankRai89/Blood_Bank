@@ -22,7 +22,10 @@ import { motion } from "framer-motion";
 const ProgressChart = ({ data }) => {
   if (!data || data.length === 0) return null;
 
-  const maxVal = Math.max(...data.map((d) => Math.max(d.donors, d.donations)), 1);
+  const maxVal = Math.max(
+    ...data.map((d) => Math.max(d.donors, d.donations)),
+    1,
+  );
   const chartHeight = 300;
   const chartWidth = 800;
   const padding = 40;
@@ -41,7 +44,10 @@ const ProgressChart = ({ data }) => {
     }, "");
   };
 
-  const donorDataPoints = data.map((d, i) => ({ x: getX(i), y: getY(d.donors) }));
+  const donorDataPoints = data.map((d, i) => ({
+    x: getX(i),
+    y: getY(d.donors),
+  }));
   const donationDataPoints = data.map((d, i) => ({
     x: getX(i),
     y: getY(d.donations),

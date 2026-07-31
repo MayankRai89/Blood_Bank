@@ -1,0 +1,421 @@
+[33mcommit ef36d4aa3a1c63e9c792cebcaa83fb67483aa0c6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Fri Jul 31 21:38:19 2026 +0530
+
+    feat: enhance database connection handling and update API URLs for local development
+
+[33mcommit 11bd1971fd3316afdde4fd9da00209b4c244582a[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sat May 30 12:11:07 2026 +0530
+
+    feat: implement unified registration, authentication, and profile retrieval controllers for all user roles
+
+[33mcommit a0c04a080ab381b132c5cb6a41a078b11d43a928[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sat May 30 09:27:19 2026 +0530
+
+    feat: implement donor controller with profile management, stats, and history retrieval functions
+
+[33mcommit a0e69e5d044a9b20aa584aafb40dae716161353a[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sat May 30 08:58:14 2026 +0530
+
+    feat: implement real-time blood camp management and dashboard routing with socket.io integration
+
+[33mcommit 6a08a141e950ba905ae62f41fe26b3c25dfdc05f[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Wed Apr 22 23:15:34 2026 +0530
+
+    fix: update clone URL and improve formatting in CONTRIBUTING.md
+
+[33mcommit 3ffe707a0bf33ac8ae7413f48bbe5e6c3c4bade8[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 19:32:29 2026 +0530
+
+    feat: implement auto-update for past blood camps to completed status
+
+[33mcommit f76ce00c28fc39f90716fa1732bb82a0ea640263[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 19:14:27 2026 +0530
+
+    feat: add functionality to retrieve available donors and record donations with notifications
+
+[33mcommit c50ddc2e063a51cb5c21f95e10a08dc21a7f97c2[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 18:06:17 2026 +0530
+
+    feat: add growth data calculation and visualization to admin dashboard
+
+[33mcommit 7c4fc2cba1a9dec6fd7b6686bcbdddcbeddc0721[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 17:50:02 2026 +0530
+
+    feat: enhance chatbot capabilities for broader topic support and improved donor information retrieval
+
+[33mcommit 9d3a5250ff5a10179b3348423baa9b78e55497c7[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 17:37:28 2026 +0530
+
+    feat: add routing configuration for single-page application support
+
+[33mcommit 7765ec1ecef7fd6d277d0e38beadf63bbcdfa712[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 17:33:54 2026 +0530
+
+    feat: standardize assistant greeting for guest and unauthenticated users
+
+[33mcommit e7c941ba1178f1e07ff509168d6c183eb7e5d0e0[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 16:59:25 2026 +0530
+
+    feat: enhance chatbot context management for dynamic user role handling and personalized responses
+
+[33mcommit f106a09463a226ee9be4610cc01a11460bc9f8c8[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 16:45:17 2026 +0530
+
+    style: update chatbot CSS for improved aesthetics and color scheme
+
+[33mcommit 82137aff46bf473824fa0fd149eb189b6f83d2b6[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 16:39:47 2026 +0530
+
+    feat: update chatbot to fetch and display personalized donor information
+
+[33mcommit c97fca92215ee42dbb76822c14076d29dece84da[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 16:34:58 2026 +0530
+
+    feat: enhance AI chatbot with personalized user prompts and privacy instructions
+
+[33mcommit 32e550a2aec1a820304bf8b20808439edb9258a3[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Apr 19 16:11:26 2026 +0530
+
+    feat: integrate AI-powered medical chatbot for personalized user support
+
+[33mcommit 5c175b1b73d191180914fa1244be52c0d98dc9f1[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Tue Apr 7 20:49:29 2026 +0530
+
+    refactor: update routing imports and navigation methods across components
+
+[33mcommit fbd9b4219518ec6b0826d39eda809a6a160cf449[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Tue Mar 31 17:15:27 2026 +0530
+
+    paste live link
+
+[33mcommit f8d499f9b6d2d243fa1a54bff1176c9a23d5e78c[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Mon Mar 30 22:11:52 2026 +0530
+
+    update readme
+
+[33mcommit bc34abe0bf8b46452e04322dda8443fddf636279[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Sun Mar 29 11:04:13 2026 +0530
+
+    doing more updates in blood camp, hospital mnagement
+
+[33mcommit 22e655ab71332327c02c21c9b182e1ea29e68ada[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Fri Mar 27 14:05:38 2026 +0530
+
+    update landing page
+
+[33mcommit fda04daa405a37f3b2e37f5bad420c403b95b289[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 19:21:28 2026 +0530
+
+    updata landing page
+
+[33mcommit 9a6fc348c28adf3d431b2f21d3b66ee56e4c56d4[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 19:09:03 2026 +0530
+
+    landing icon change
+
+[33mcommit a7779145bc750e77c1dbddd04baa64f94b48eec2[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 14:29:57 2026 +0530
+
+    update backend render endpoints
+
+[33mcommit 91c07cf6248051db77b3ec3e986e579654e1eb14[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 14:21:13 2026 +0530
+
+    update start command
+
+[33mcommit 15f722419c64309691592708d6c04db0e2b1cfc6[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 14:19:00 2026 +0530
+
+    deleted public folder
+
+[33mcommit 22be73f6eb4bfa6f4347d6604fb27e577ea55bde[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 26 13:43:38 2026 +0530
+
+    commit build file in backend
+
+[33mcommit aabfc9837cc816ce93eb0eb5ab6cc0adc15e2165[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Mon Mar 23 12:36:10 2026 +0530
+
+    fix: update API endpoints to use production URL
+
+[33mcommit 1854914ee925ee16a308211d61ac236f92435eb1[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Mon Mar 23 11:45:44 2026 +0530
+
+    fix: standardize formatting of Madhya Pradesh state entry in DonorRegister and FacultyRegister components
+
+[33mcommit d47acf18b267e1110499c111434b06b5118f75ca[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Mon Mar 23 11:40:34 2026 +0530
+
+    Refactor Hospital Dashboard and Request components to use local API endpoints; improve code readability and formatting
+
+[33mcommit effb05cae8785cf7f4ffc1fff291473434850585[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 15:21:58 2026 +0530
+
+    fix: update CORS middleware to allow multiple origins
+
+[33mcommit ffa99fb4aae318c7553acb1ece829e4d8d0c6bea[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 15:16:40 2026 +0530
+
+    fix: add root route to return server status message
+
+[33mcommit eb83ec820a8e4042cbf16e85812e6f6c3cbda6a4[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 15:09:09 2026 +0530
+
+    fix: standardize import formatting in ProtectedRoute component
+
+[33mcommit 6e278a017a85c3e5feb4d146b70924e378679f1a[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 15:08:01 2026 +0530
+
+    Update API endpoints to use production URL and improve code formatting
+    
+    - Changed all API calls from localhost to the production URL: https://blood-bank-1-acmn.onrender.com
+    - Refactored code for better readability and consistency in formatting across various components.
+    - Ensured all relevant components are updated to reflect the new API endpoint.
+
+[33mcommit 210db93105c90b8e2a1911264cd37a0a9823a2a1[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 14:22:19 2026 +0530
+
+    fix: change start script to use node instead of nodemon
+
+[33mcommit 5f31550d6fb1abf073a1e6a626e0cfd7f70b621b[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 13:56:47 2026 +0530
+
+    fix: add node_module to .gitignore and remove peer flag from express dependency
+
+[33mcommit 7d531823ac9859317df32bc383b1e65fa2499cc5[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 13:39:18 2026 +0530
+
+    fix: update CORS origin to match the correct URL
+
+[33mcommit 1890669e19d06bcaca989771f2f394b60888843a[m
+Author: Mayank Rai <149506720+MayankRai89@users.noreply.github.com>
+Date:   Thu Mar 19 13:12:09 2026 +0530
+
+    Initial commit
+
+[33mcommit fc6c83b3d8ceb9ef5f250c33b171511a683c64f7[m
+Author: Suraj Savle <surajsavle143@gmail.com>
+Date:   Fri Dec 26 02:30:37 2025 +0530
+
+    Update README with admin account setup instructions
+    
+    Added instructions for seeding admin account before starting the backend server.
+
+[33mcommit aa919dbcea66d10552c9489e4221f91254be840c[m
+Author: キリスト・ムアコ <112662247+mr0xff@users.noreply.github.com>
+Date:   Thu Dec 25 21:51:27 2025 +0100
+
+    swagger openapi api documentation (#2)
+    
+    * add: ignore priv env
+    
+    * add: install swagger dep and setup config
+    
+    * add: swagger endpoint definition
+    
+    * update: reordered
+    
+    * add: register endpoint
+    
+    * add: profile endpoint
+    
+    * add: documentation
+
+[33mcommit 49821033944286db1629456b40b61d27273e8417[m
+Merge: c1f3c0b f981c1d
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Thu Dec 25 19:43:57 2025 +0530
+
+    Merge branch 'main' of https://github.com/suraj-savle/blood-bank-management-system
+
+[33mcommit c1f3c0b3bbb52bb1ed8539cda5b3fe6154dc99cd[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Thu Dec 25 19:40:39 2025 +0530
+
+    fix: remove duplicate BloodModel file caused by casing
+
+[33mcommit f981c1d3020d4d071784cd2cd387e3794760e1b3[m
+Author: Suraj Savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 22:23:32 2025 +0530
+
+    fix readme
+
+[33mcommit 54efbd41e7ee5253e873fa0ae23c68ca921f89b9[m
+Author: Suraj Savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 22:22:29 2025 +0530
+
+    Add contributing guidelines for BBMS
+    
+    This document outlines the steps for contributing to the Blood Bank Management System project, including forking the repository, setting up the environment, and submitting a pull request.
+
+[33mcommit b1ea0ee0842f821e7dbafba85c7cd559c88c3533[m
+Author: Suraj Savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 22:16:34 2025 +0530
+
+    Add MIT License to the project
+
+[33mcommit 9967361da36608174ba310ba52827ec26c913496[m
+Author: Suraj Savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 22:15:20 2025 +0530
+
+    Revise README for Blood Bank Management System
+    
+    Updated the README to provide a comprehensive overview of the Blood Bank Management System, including features, tech stack, and setup instructions.
+
+[33mcommit 21e612d05ff73ad546acd3146fff79479ac6272b[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 21:58:44 2025 +0530
+
+    Remove node_modules from git
+
+[33mcommit 5cd6a9f25896cc9528df80bf27f58faf551d30e3[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 21:58:06 2025 +0530
+
+    Remove .env from git
+
+[33mcommit 71f51fee603be9f48f8b9c4df40ca7df872cf44c[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 21:56:08 2025 +0530
+
+    Restore repository to state before .env removal
+
+[33mcommit c561fb4d7b65072ce150aeacae1a2d79da37d55a[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 21:09:41 2025 +0530
+
+    Restore all files except node_modules
+
+[33mcommit a39dfabba4b95000509ddcefae3641656216cce8[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Dec 2 20:56:16 2025 +0530
+
+    Removed node_modules from backend
+
+[33mcommit b991b6ea451e88cefb2bf057190459677c1346f2[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sun Nov 30 17:51:16 2025 +0530
+
+    Removed .env file and added to .gitignore
+
+[33mcommit d03d77b2b775759e3047e1c363c8ee5721e4c2b3[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sun Nov 30 17:49:15 2025 +0530
+
+    update .env.example
+
+[33mcommit 3827d8fbe9f1bc0f97af02702e60251ed3af47ee[m
+Merge: b3fce8a fabcd71
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sun Nov 30 17:37:09 2025 +0530
+
+    Merge branch 'main' of https://github.com/suraj-savle/bbms
+
+[33mcommit b3fce8a7ee2728a84446fc51c6d5a6c2c30ea4f1[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sun Nov 30 17:36:46 2025 +0530
+
+    update .env
+
+[33mcommit d187581087c42dfc92d33db502a1b7d33e5b0465[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sun Nov 30 17:35:33 2025 +0530
+
+    upload on github
+
+[33mcommit fabcd714c0eb277b81865daf6c9351e775f0f019[m
+Author: Suraj Savle <iamsurajsavle@gmail.com>
+Date:   Sat Nov 29 12:43:52 2025 +0530
+
+    Update README.md
+
+[33mcommit b91b7f52961bf67d57c56ed41e51c9064c6ff226[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Fri Nov 28 13:54:27 2025 +0530
+
+    every big feature is added
+
+[33mcommit dc5b2d4fbdd6be7ef8dc34fd350694f5e6a501e0[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Wed Nov 26 13:05:39 2025 +0530
+
+    some major changes , more feature like camp creation . update both side donor and lab now moving on hopital
+
+[33mcommit e6a90be59dbd617a79c4b6222b7a9bba3b07aea6[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Thu Nov 13 21:19:37 2025 +0530
+
+    many thing is add or update
+
+[33mcommit 4765edb5c6b36905e7c9a3211ce9cc73db9946fd[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Sat Oct 4 19:39:30 2025 +0530
+
+    auth for all routes
+
+[33mcommit a64986a77161a4c3bbbd755d733cfa8b4182c8b4[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Wed Sep 10 21:25:14 2025 +0530
+
+    refactor: replace CampModel with HospitalCampModel and add hospital request functionality
+
+[33mcommit a7009ee4a6aa01d688757a4cbc1e328af68f0812[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Wed Sep 3 20:20:46 2025 +0530
+
+    fix: correct syntax error in CampModel.js
+
+[33mcommit aab1e807d258f787cfd51bd2996a449b5b7cbda7[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Wed Sep 3 19:24:41 2025 +0530
+
+    refactor: remove deprecated user and blood stock models, update authentication and routing structure
+
+[33mcommit f0f70740d97823c58658e6eddb655490235f6b22[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Sep 2 17:25:32 2025 +0530
+
+    check point
+
+[33mcommit 9cd82323bb3d552addfdf7175573c49380900973[m
+Author: suraj savle <surajsavle143@gmail.com>
+Date:   Tue Sep 2 17:23:56 2025 +0530
+
+    first commit

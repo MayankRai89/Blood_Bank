@@ -25,16 +25,18 @@ app.use(express.json());
 
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
   "https://blood-bank-tan.vercel.app",
+  "https://blood-bank-urer.onrender.com",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith(".vercel.app")) {
         callback(null, true);
       } else {
-        callback(new Error("CORS not allowed"));
+        callback(null, true);
       }
     },
     credentials: true,
