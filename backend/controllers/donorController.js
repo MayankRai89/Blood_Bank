@@ -526,6 +526,7 @@ export const markDonation = async (req, res) => {
     await sendDonationNotification({
       donor,
       facilityName: facility.name || facility.facilityName,
+      locationName: facility.name || facility.facilityName,
       quantity,
       bloodGroup: bloodType
     });
