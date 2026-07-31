@@ -2,6 +2,8 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 // Constants for better maintainability
 const FACILITY_TYPES = ["Hospital", "Blood Lab"];
@@ -352,16 +354,50 @@ export default function FacilityRegisterForm() {
   const progressPercentage = (step / 3) * 100;
 
   return (
-    <div className="min-h-screen bg-red-50 flex items-center justify-center py-8 px-4">
-      <div className="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Header Section */}
-        <div className="bg-red-700 text-white p-6">
-          <h1 className="text-2xl font-bold text-center mb-2">
-            Blood Facility Registration
-          </h1>
-          <p className="text-center mb-4 opacity-90">
-            Register your facility in 3 simple steps
-          </p>
+    <div className="min-h-screen flex flex-col justify-between bg-gradient-to-br from-red-950 via-gray-900 to-red-900 text-gray-100">
+      <Header />
+      
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-3xl bg-white text-gray-900 rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+          
+          {/* Header Section */}
+          <div className="bg-gradient-to-r from-red-700 via-red-800 to-red-900 text-white p-8">
+            <div className="flex items-center justify-between mb-4">
+              <span className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider">
+                🏥 Healthcare Facility Portal
+              </span>
+              <span className="text-xs font-bold text-red-200 bg-red-950/40 px-3 py-1 rounded-full">
+                Step {step} of 3 ({progressPercentage.toFixed(0)}%)
+              </span>
+            </div>
+
+            <h1 className="text-2xl md:text-3xl font-black mb-1">
+              Facility Registration
+            </h1>
+            <p className="text-red-100 text-xs md:text-sm opacity-90 mb-6">
+              Register your Hospital or Blood Bank Lab in 3 simple steps
+            </p>
+
+            {/* Progress Bar */}
+            <div className="w-full bg-red-950/50 rounded-full h-2 mb-4 overflow-hidden">
+              <div
+                className="bg-white h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center text-xs font-bold">
+              <div className={`py-1.5 rounded-lg transition ${step >= 1 ? "bg-white/20 text-white" : "text-red-300/60"}`}>
+                1. Basic Info
+              </div>
+              <div className={`py-1.5 rounded-lg transition ${step >= 2 ? "bg-white/20 text-white" : "text-red-300/60"}`}>
+                2. Details & Proof
+              </div>
+              <div className={`py-1.5 rounded-lg transition ${step >= 3 ? "bg-white/20 text-white" : "text-red-300/60"}`}>
+                3. Address & Hours
+              </div>
+            </div>
+          </div>
 
           {/* Progress Bar */}
           <div className="mb-2 flex justify-between items-center text-sm">
@@ -882,6 +918,8 @@ export default function FacilityRegisterForm() {
           </div>
         </form>
       </div>
+
+      <Footer />
     </div>
   );
 }
