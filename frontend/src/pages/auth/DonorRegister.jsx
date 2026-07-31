@@ -890,6 +890,7 @@ export default function DonorRegisterForm() {
           </div>
         </form>
       </div>
+      </div>
       
       <Footer />
     </div>
