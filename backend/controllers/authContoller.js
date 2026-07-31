@@ -9,6 +9,23 @@ import crypto from "crypto";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const DISPOSABLE_DOMAINS = [
+  "tempmail.com", "mailinator.com", "yopmail.com", "10minutemail.com",
+  "guerrillamail.com", "trashmail.com", "sharklasers.com", "dispostable.com",
+  "getnada.com", "binkmail.com", "bobmail.info", "temp-mail.org", "fakeinbox.com",
+  "disposablemail.com", "mailnesia.com", "maildrop.cc"
+];
+
+const isValidEmail = (email) => {
+  if (!email || typeof email !== "string") return false;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email.trim())) return false;
+  
+  const domain = email.trim().split("@")[1]?.toLowerCase();
+  if (!domain || DISPOSABLE_DOMAINS.includes(domain)) return false;
+  return true;
+};
+
 /**
  * REGISTER (Unified)
  */
@@ -20,8 +37,10 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Role is required" });
     }
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
+    if (!email || !isValidEmail(email)) {
+      return res.status(400).json({
+        message: "Please enter a valid, permanent email address. Temporary or disposable emails are not allowed."
+      });
     }
 
     // Check if user already exists in any collection
