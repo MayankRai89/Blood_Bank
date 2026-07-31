@@ -4,6 +4,7 @@ import Facility from "../models/facilityModel.js";
 import Admin from "../models/adminModel.js";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
+import { sendWelcomeEmail } from "../services/notificationService.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -41,6 +42,13 @@ export const register = async (req, res) => {
     } else {
       return res.status(400).json({ message: "Invalid role" });
     }
+
+    // Send Welcome Email asynchronously
+    sendWelcomeEmail({
+      email: user.email,
+      name: user.fullName || user.name || user.email.split("@")[0],
+      role: user.role,
+    });
 
     // Decide redirect based on role
     const redirect =
