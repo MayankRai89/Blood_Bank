@@ -11,30 +11,36 @@ const password = process.env.REDIS_PASSWORD ? process.env.REDIS_PASSWORD.replace
 
 if (host) {
   try {
+    let hasLoggedError = false;
+
     redisClient = new Redis({
       host,
       port,
       password,
-      connectTimeout: 5000,
-      maxRetriesPerRequest: 2,
+      connectTimeout: 4000,
+      enableOfflineQueue: false, // Prevents queuing when Redis is offline or DNS fails
+      maxRetriesPerRequest: 1,
       retryStrategy(times) {
-        if (times > 5) {
-          console.warn("⚠️ Redis retry limit reached. Falling back to direct database queries.");
-          return null; // Stop retrying after 5 attempts
+        if (times > 3) {
+          return null; // Stop retrying after 3 attempts
         }
-        return Math.min(times * 200, 2000);
+        return 1000;
       },
     });
 
     redisClient.on("connect", () => {
       console.log(`✅ Redis Client Connected: ${host}:${port}`);
+      hasLoggedError = false;
     });
 
     redisClient.on("error", (err) => {
-      console.warn("⚠️ Redis Client Warning:", err.message || err);
+      if (!hasLoggedError) {
+        console.warn(`⚠️ Redis Client Warning (${err.code || err.message}). Operating in direct database mode.`);
+        hasLoggedError = true;
+      }
     });
   } catch (err) {
-    console.error("❌ Redis Client Initialization Error:", err.message);
+    console.warn("⚠️ Redis Client Initialization Warning:", err.message);
     redisClient = null;
   }
 } else {
