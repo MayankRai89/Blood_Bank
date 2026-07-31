@@ -39,7 +39,7 @@ const BloodLabDonor = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "https://blood-bank-urer.onrender.com/api/blood-lab/donors/available",
+        "/api/blood-lab/donors/available",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setResults(res.data.donors || []);
@@ -62,7 +62,7 @@ const BloodLabDonor = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `https://blood-bank-urer.onrender.com/api/blood-lab/donors/search?term=${term}`,
+        `/api/blood-lab/donors/search?term=${term}`,
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
@@ -83,7 +83,7 @@ const BloodLabDonor = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        "https://blood-bank-urer.onrender.com/api/blood-lab/donations/recent",
+        "/api/blood-lab/donations/recent",
         { headers: { Authorization: `Bearer ${token}` } },
       );
       setRecentDonations(res.data.donations || []);
@@ -116,7 +116,7 @@ const BloodLabDonor = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://blood-bank-urer.onrender.com/api/blood-lab/donors/donate/${selectedDonor._id}`,
+        `/api/blood-lab/donors/donate/${selectedDonor._id}`,
         donationData,
         { headers: { Authorization: `Bearer ${token}` } },
       );
@@ -137,7 +137,7 @@ const BloodLabDonor = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://blood-bank-urer.onrender.com/api/blood-lab/donors/donate/${donorId}`,
+        `/api/blood-lab/donors/donate/${donorId}`,
         { quantity: 1, remarks: "Quick donation" },
         { headers: { Authorization: `Bearer ${token}` } },
       );

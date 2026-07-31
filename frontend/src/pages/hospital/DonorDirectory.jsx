@@ -117,7 +117,7 @@ const DonorDirectory = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `https://blood-bank-urer.onrender.com/api/hospital/donors/${selectedDonor._id}/donate`,
+        `/api/hospital/donors/${selectedDonor._id}/donate`,
         donationData,
         { headers: { Authorization: `Bearer ${token}` } },
       );

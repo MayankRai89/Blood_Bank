@@ -320,7 +320,10 @@ function AdminCamps() {
 
                 <div className="space-y-3 text-sm text-gray-700">
                   <div className="flex items-center gap-2">
-                    <Building2 size={16} className="text-red-500 flex-shrink-0" />
+                    <Building2
+                      size={16}
+                      className="text-red-500 flex-shrink-0"
+                    />
                     <span>{camp.hospital?.name || "Unknown facility"}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -330,7 +333,10 @@ function AdminCamps() {
                     </span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <MapPin size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+                    <MapPin
+                      size={16}
+                      className="text-red-500 flex-shrink-0 mt-0.5"
+                    />
                     <span>
                       {camp.location?.venue}, {camp.location?.city},{" "}
                       {camp.location?.state}
