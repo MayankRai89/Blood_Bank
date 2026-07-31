@@ -100,6 +100,9 @@ const donorSchema = new mongoose.Schema(
     loginAttempts: { type: Number, default: 0 },
     lockUntil: Date,
     isActive: { type: Boolean, default: true },
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpires: Date,
   },
   { timestamps: true }
 );

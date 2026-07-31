@@ -86,6 +86,9 @@ const facilitySchema = new mongoose.Schema(
     approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
     approvedAt: Date,
     rejectionReason: String,
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpires: Date,
 
     // 🕒 Operating Info (for admin dashboard)
     operatingHours: {

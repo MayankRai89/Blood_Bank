@@ -4,7 +4,8 @@ import Facility from "../models/facilityModel.js";
 import Admin from "../models/adminModel.js";
 import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
-import { sendWelcomeEmail } from "../services/notificationService.js";
+import { sendWelcomeEmail, sendVerificationLinkEmail } from "../services/notificationService.js";
+import crypto from "crypto";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -33,21 +34,35 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "Email is already registered" });
     }
 
-    let user;
+    // Generate email verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const payload = {
+      ...req.body,
+      isEmailVerified: false,
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+    };
 
+    let user;
     if (role === "donor") {
-      user = await Donor.create(req.body);
+      user = await Donor.create(payload);
     } else if (role === "hospital" || role === "blood-lab") {
-      user = await Facility.create(req.body);
+      user = await Facility.create(payload);
     } else {
       return res.status(400).json({ message: "Invalid role" });
     }
 
-    // Send Welcome Email asynchronously
+    // Send Welcome Email and Verification Link asynchronously
     sendWelcomeEmail({
       email: user.email,
       name: user.fullName || user.name || user.email.split("@")[0],
       role: user.role,
+    });
+
+    sendVerificationLinkEmail({
+      email: user.email,
+      name: user.fullName || user.name || user.email.split("@")[0],
+      token: verificationToken,
     });
 
     // Decide redirect based on role
@@ -267,5 +282,43 @@ export const googleLogin = async (req, res) => {
   } catch (error) {
     console.error("🚨 Google Login Error:", error);
     res.status(500).json({ message: "Google authentication failed", error: error.message });
+  }
+};
+
+/**
+ * VERIFY EMAIL ADDRESS VIA TOKEN
+ */
+export const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Verification token is required" });
+    }
+
+    let user =
+      (await Donor.findOne({ emailVerificationToken: token })) ||
+      (await Facility.findOne({ emailVerificationToken: token }));
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid or expired verification token" });
+    }
+
+    if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
+      return res.status(400).json({ success: false, message: "Verification token has expired" });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Email address verified successfully! You can now log in.",
+    });
+  } catch (error) {
+    console.error("Verify email error:", error);
+    res.status(500).json({ success: false, message: "Server error during email verification" });
   }
 };
