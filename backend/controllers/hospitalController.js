@@ -2,6 +2,7 @@ import Blood from "../models/bloodModel.js";
 import Facility from "../models/facilityModel.js";
 import BloodRequest from "../models/bloodRequestModel.js";
 import Donor from "../models/donorModel.js";
+import { getCache, setCache } from "../config/redis.js";
 
 /* ==============================================================
    HOSPITAL BLOOD REQUEST MANAGEMENT
@@ -269,6 +270,12 @@ export const getAllDonors = async (req, res) => {
         break;
     }
 
+    const cacheKey = `hospital:donors:search:${JSON.stringify(req.query)}`;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      return res.json(cachedData);
+    }
+
     const skip = (page - 1) * parseInt(limit);
 
     // Get donors with pagination
@@ -297,7 +304,7 @@ export const getAllDonors = async (req, res) => {
       })
     ]);
 
-    res.json({
+    const result = {
       success: true,
       donors,
       pagination: {
@@ -312,7 +319,10 @@ export const getAllDonors = async (req, res) => {
         available: availableDonors,
         rareBlood: rareBloodDonors
       }
-    });
+    };
+
+    await setCache(cacheKey, result, 120); // Cache for 2 minutes
+    res.json(result);
   } catch (err) {
     console.error("Get all donors error:", err);
     res.status(500).json({ success: false, message: "Failed to fetch donors" });

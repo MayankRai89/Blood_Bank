@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import Blood from "../models/bloodModel.js";
 import { sendDonationNotification } from "../services/notificationService.js";
+import { getCache, setCache, delCachePattern } from "../config/redis.js";
 
 // /* 👤 Get Donor Profile */
 export const getDonorProfile = async (req, res) => {
@@ -399,6 +400,12 @@ export const searchDonor = async (req, res) => {
         .json({ success: false, message: "Search term required" });
     }
 
+    const cacheKey = `donors:search:${term.trim().toLowerCase()}`;
+    const cachedResults = await getCache(cacheKey);
+    if (cachedResults) {
+      return res.status(200).json(cachedResults);
+    }
+
     const donors = await Donor.find({
       $or: [
         { fullName: { $regex: term, $options: "i" } },
@@ -412,7 +419,10 @@ export const searchDonor = async (req, res) => {
       .limit(20)
       .sort({ lastDonationDate: -1 });
 
-    res.status(200).json({ success: true, donors });
+    const response = { success: true, donors };
+    await setCache(cacheKey, response, 180); // Cache for 3 minutes
+
+    res.status(200).json(response);
   } catch (err) {
     console.error("Search donor error:", err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -530,6 +540,10 @@ export const markDonation = async (req, res) => {
       quantity,
       bloodGroup: bloodType
     });
+
+    // Invalidate Redis caches for donor searches
+    await delCachePattern("donors:*");
+    await delCachePattern("hospital:donors:*");
 
     res.status(200).json({
       success: true,
