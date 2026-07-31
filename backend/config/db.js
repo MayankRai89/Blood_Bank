@@ -22,7 +22,7 @@ const connectDB = async () => {
     console.log(`✅ Fallback Local MongoDB Connected: ${conn.connection.host}`);
   } catch (fallbackError) {
     console.error("❌ Both Primary and Local Fallback MongoDB connections failed:", fallbackError.message);
-    process.exit(1);
+    console.warn("⚠️ Web server running. Please verify MONGO_URI in Render Environment Variables.");
   }
 };
 

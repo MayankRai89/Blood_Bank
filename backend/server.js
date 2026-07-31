@@ -71,14 +71,8 @@ app.use("/api/hospital", hospitalRoutes);
 app.get("/", (req, res) => {
   res.send("Blood Bank API is Running 🚀");
 });
-// Start server after DB connection
-const startServer = async () => {
-  try {
-    await connectDB();
-    server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
-  } catch (error) {
-    console.error("❌ Server failed to start:", error);
-  }
-};
-
-startServer();
+// Start HTTP server immediately so Render detects open port
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  connectDB();
+});
