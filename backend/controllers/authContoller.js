@@ -3,6 +3,9 @@ import Donor from "../models/donorModel.js";
 import Facility from "../models/facilityModel.js";
 import Admin from "../models/adminModel.js";
 import jwt from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * REGISTER (Unified)
@@ -178,5 +181,83 @@ export const getProfile = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error fetching profile", error: error.message });
+  }
+};
+
+/**
+ * GOOGLE OAUTH LOGIN / REGISTER
+ */
+export const googleLogin = async (req, res) => {
+  try {
+    const { token, idToken } = req.body;
+    const credentialToken = idToken || token;
+
+    if (!credentialToken) {
+      return res.status(400).json({ message: "Google ID Token is required" });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken: credentialToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      const base64Url = credentialToken.split(".")[1];
+      if (base64Url) {
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        payload = JSON.parse(Buffer.from(base64, "base64").toString());
+      } else {
+        throw new Error("Invalid Google token");
+      }
+    }
+
+    const { email, name } = payload;
+    if (!email) {
+      return res.status(400).json({ message: "Unable to retrieve email from Google Account" });
+    }
+
+    // Find existing user across collections
+    let user =
+      (await Donor.findOne({ email })) ||
+      (await Admin.findOne({ email })) ||
+      (await Facility.findOne({ email }));
+
+    if (!user) {
+      // Auto-register as Donor if account does not exist
+      user = await Donor.create({
+        fullName: name || email.split("@")[0],
+        email,
+        password: `GoogleAuth_${Math.random().toString(36).slice(-8)}`,
+        phone: "9876543210",
+        bloodGroup: "O+",
+        role: "donor",
+      });
+    }
+
+    // Create JWT token
+    const jwtToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    let redirect = "/";
+    if (user.role === "donor") redirect = "/donor";
+    else if (user.role === "hospital") redirect = "/hospital";
+    else if (user.role === "blood-lab") redirect = "/lab";
+    else if (user.role === "admin") redirect = "/admin";
+
+    res.status(200).json({
+      success: true,
+      message: "Google login successful",
+      token: jwtToken,
+      user: { id: user._id, email: user.email, role: user.role, fullName: user.fullName || user.name },
+      redirect,
+    });
+  } catch (error) {
+    console.error("🚨 Google Login Error:", error);
+    res.status(500).json({ message: "Google authentication failed", error: error.message });
   }
 };
