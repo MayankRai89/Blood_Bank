@@ -421,10 +421,9 @@ export default function FacilityRegisterForm() {
               Details
             </span>
           </div>
-        </div>
 
-        {/* Form Section */}
-        <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
+          {/* Form Section */}
+          <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
           {/* Step 1: Basic Information */}
           {step === 1 && (
             <div className="space-y-6">
@@ -916,8 +915,8 @@ export default function FacilityRegisterForm() {
               </button>
             )}
           </div>
-        </form>
-      </div>
+          </form>
+        </div>
       </div>
 
       <Footer />
