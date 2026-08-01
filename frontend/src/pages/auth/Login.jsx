@@ -52,7 +52,9 @@ export default function Login() {
     const setupGoogle = () => {
       if (window.google?.accounts?.id) {
         window.google.accounts.id.initialize({
-          client_id: "310224542593-qi5ae6b72717m09d665fubvgae2knceo.apps.googleusercontent.com",
+          client_id:
+            import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+            "310224542593-qi5ae6b72717m09d665fubvgae2knceo.apps.googleusercontent.com",
           callback: handleCredentialResponse,
         });
         const googleDiv = document.getElementById("googleBtnContainer");
