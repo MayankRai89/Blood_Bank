@@ -54,7 +54,7 @@ export default function Login() {
         window.google.accounts.id.initialize({
           client_id:
             import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-            "310224542593-qi5ae6b72717m09d665fubvgae2knceo.apps.googleusercontent.com",
+            "310224542593-r90r5g6orgpnatm4tjpp36gpa9b0p9a2.apps.googleusercontent.com",
           callback: handleCredentialResponse,
         });
         const googleDiv = document.getElementById("googleBtnContainer");
