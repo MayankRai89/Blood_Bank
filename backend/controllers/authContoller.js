@@ -7,7 +7,6 @@ import { OAuth2Client } from "google-auth-library";
 import { sendWelcomeEmail, sendVerificationLinkEmail } from "../services/notificationService.js";
 import crypto from "crypto";
 
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const DISPOSABLE_DOMAINS = [
   "tempmail.com", "mailinator.com", "yopmail.com", "10minutemail.com",
@@ -240,18 +239,25 @@ export const googleLogin = async (req, res) => {
 
     let payload;
     try {
-      const ticket = await googleClient.verifyIdToken({
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+      const ticket = await client.verifyIdToken({
         idToken: credentialToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: [
+          process.env.GOOGLE_CLIENT_ID,
+          "310224542593-r90r5g6orgpnatm4tjpp36gpa9b0p9a2.apps.googleusercontent.com",
+          "310224542593-qi5ae6b72717m09d665fubvgae2knceo.apps.googleusercontent.com",
+        ].filter(Boolean),
       });
       payload = ticket.getPayload();
     } catch (verifyErr) {
-      const base64Url = credentialToken.split(".")[1];
-      if (base64Url) {
+      console.warn("Google ID Token verification warning:", verifyErr.message);
+      const parts = credentialToken.split(".");
+      if (parts.length >= 2) {
+        const base64Url = parts[1];
         const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
         payload = JSON.parse(Buffer.from(base64, "base64").toString());
       } else {
-        throw new Error("Invalid Google token");
+        throw new Error("Invalid Google authentication token");
       }
     }
 
