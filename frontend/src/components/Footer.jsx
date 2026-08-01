@@ -175,12 +175,12 @@ const Footer = () => {
       </div>
 
       {/* Floating Donate Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50">
         <Link
           to="/register/donor"
-          className="flex items-center gap-2 px-6 py-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 hover:from-red-700 hover:to-red-800"
+          className="flex items-center gap-2 px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105 hover:from-red-700 hover:to-red-800"
         >
-          <Heart className="w-5 h-5" />
+          <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>Donate Now</span>
         </Link>
       </div>

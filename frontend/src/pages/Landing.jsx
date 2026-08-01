@@ -760,6 +760,15 @@ export default function LandingPage() {
             grid-template-columns: 1fr !important;
           }
         }
+        @media (max-width: 550px) {
+          section > div[style*="repeat(2,1fr)"] {
+            grid-template-columns: 1fr !important;
+          }
+          section {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+          }
+        }
       `}</style>
     </div>
   );

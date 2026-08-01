@@ -577,7 +577,7 @@ const DashboardLayout = ({ userRole = "donor" }) => {
             sidebarCollapsed ? "lg:ml-0" : "lg:ml-0"
           }`}
         >
-          <div className="h-full overflow-auto p-4 sm:p-6">
+          <div className="h-full overflow-auto p-4 sm:p-6 pb-20 lg:pb-6">
             {/* PASSING DATA TO OUTLET HERE */}
             <Outlet context={{ userData, theme }} />
           </div>

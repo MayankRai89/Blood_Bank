@@ -252,7 +252,7 @@ function GetAllFacilities() {
 
           {/* Stats Card */}
           <div className="bg-white rounded-2xl shadow-lg border border-red-100 p-6 mb-6">
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-800">
                   {facilities.length}
